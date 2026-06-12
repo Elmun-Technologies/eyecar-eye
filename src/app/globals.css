@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+:root {
+  --background: #e9e9f3;
+  --foreground: #17171f;
+  --surface: #eeeef5;
+  --muted: #8a8a96;
+  --accent-dark: #383844;
+  --accent-dark-hover: #2c2c36;
+  --green: #3fc04f;
+  --green-deep: #2da53d;
+  --red: #c0392b;
+  --blue-card-from: #d9e4f4;
+  --blue-card-to: #bed4ee;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-dark-hover: var(--accent-dark-hover);
+  --color-brand-green: var(--green);
+  --color-brand-green-deep: var(--green-deep);
+  --color-brand-red: var(--red);
+  --font-sans: var(--font-manrope);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+}
+
+/* Halftone dot backdrop (fades out towards the bottom, like the original) */
+.dot-pattern {
+  background-image: radial-gradient(
+    circle,
+    rgba(122, 110, 228, 0.22) 1.6px,
+    transparent 1.7px
+  );
+  background-size: 15px 15px;
+  mask-image: radial-gradient(
+    ellipse 90% 70% at 50% 18%,
+    black 0%,
+    transparent 75%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 90% 70% at 50% 18%,
+    black 0%,
+    transparent 75%
+  );
+}
+
+/* Soft multicolour glow behind the primary squircle button */
+.glow-card {
+  position: relative;
+}
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 36px;
+  background: conic-gradient(
+    from 140deg,
+    #f8b8d0,
+    #b9e7b4,
+    #bcd7f5,
+    #e7c7f2,
+    #f8b8d0
+  );
+  filter: blur(16px);
+  opacity: 0.85;
+  z-index: -1;
+}
+
+/* Corner brackets around a word in the hero title */
+.bracketed {
+  position: relative;
+  display: inline-block;
+  padding: 0.08em 0.18em;
+}
+.bracketed::before,
+.bracketed::after {
+  content: "";
+  position: absolute;
+  width: 0.42em;
+  height: 0.42em;
+  border-color: currentColor;
+  border-style: solid;
+}
+.bracketed::before {
+  top: 0;
+  left: 0;
+  border-width: 3px 0 0 3px;
+}
+.bracketed::after {
+  bottom: 0;
+  right: 0;
+  border-width: 0 3px 3px 0;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-pop-in {
+  animation: pop-in 0.22s ease-out both;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(63, 192, 79, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(63, 192, 79, 0);
+  }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 1.4s ease-out infinite;
+}
