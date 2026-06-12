@@ -18,9 +18,17 @@ tavsiya va «Smile» ko'z tomchilari taklif qilinadi.
 4. **Kamera** — old kamera, yashil oval ramka, 3-2-1 hisob bilan surat olish
 5. **Tahlil** — MediaPipe Face Landmarker (to'liq brauzerda, rasm serverga yuborilmaydi)
 6. **Natija** — shox parda va namlik skorlari, 5 yulduzli umumiy baho, ko'z kesmalari
-7. **Ma'lumot sahifasi** — shox parda shikastlanishi va A vitamini haqida
-8. **Ko'z tomchilari** — mahsulotlar karuseli (brend sahifasiga havola)
-9. **Tomchi qidiruvi** — 5 bosqichli so'rovnoma, belgilarga mos tomchini tanlaydi
+7. **Ma'lumot sahifasi** — belgilar ro'yxati, shox parda shikastlanishi va
+   A vitamini (gialuron kislota) haqida illyustratsiyalar bilan
+8. **Ko'z tomchilari** — suriladigan mahsulotlar karuseli (nuqtalar, strelkalar,
+   brend sahifasiga havola) + qidiruvga o'tish tugmasi
+9. **Tomchi qidiruvi** — originaldagi 5 bosqichli so'rovnoma:
+   belgilar (ko'p tanlov) → eng asosiy belgi → salqinlik hissi →
+   foydalanish holati (linza) → mahsulot xususiyatlari.
+   Natijada barcha shartlar bo'yicha qat'iy filtr ishlaydi; mos tomchi
+   topilmasa, «eng asosiy belgi»ga mos vositalar ko'rsatiladi.
+   Kartochkalarda A vitamini belgisi, 7 yulduzli salqinlik shkalasi va
+   «Konservantsiz» chipi bor.
 
 ## Texnologiyalar
 
@@ -85,8 +93,29 @@ surat va skorlar qurilmadan chiqmaydi.
 ## Sozlash
 
 Brend nomi, sarlavha va mahsulotlar ro'yxati bitta faylda: `src/config/site.ts`.
+Har bir mahsulotda qidiruv uchun maydonlar bor:
+
+| Maydon        | Ma'nosi                                              |
+| ------------- | ---------------------------------------------------- |
+| `symptoms`    | qaysi belgilarda tavsiya qilinadi                    |
+| `cooling`     | salqinlik darajasi, 0–7 (originaldagi yulduzlar)     |
+| `features`    | `vitaminA`, `preservativeFree`                       |
+| `scenes`      | `naked` / `soft` / `hard` (linza bilan moslik)       |
+| `image`       | mahsulot surati (`public/products/` ga joylang)      |
+| `url`         | do'kon yoki brend sahifasi havolasi                  |
+
 Ranglar va effektlar (Tailwind v4 tokenlari) — `src/app/globals.css` dagi
 CSS o'zgaruvchilari orqali (`tailwind.config` yo'q).
+
+## Qilinishi kerak (distribyutor ma'lumotlari)
+
+- [ ] Aniq assortiment: karuselda originalda 7 mahsulot bor edi, hozircha
+      5 tasi kiritilgan (THE ONE Mild va MediClear DX skrinshotlardan
+      tasdiqlangan, qolganlari taxminiy)
+- [ ] Mahsulot suratlari (`public/products/` + `site.ts` dagi `image`)
+- [ ] Haqiqiy do'kon/brend havolalari (`url` hozircha `#`)
+- [ ] Salqinlik darajalari va tavsiflarni qadoq bo'yicha tasdiqlash
+- [ ] Foydalanish shartlari (`/terms`) matnini yuridik tekshiruvdan o'tkazish
 
 ## Tuzilma
 
@@ -100,8 +129,8 @@ src/
     products/page.tsx # ko'z tomchilari karuseli
     search/page.tsx   # tomchi qidiruvi (5 bosqichli so'rovnoma)
     terms/page.tsx    # foydalanish shartlari
-  components/         # modal oqimi, nav, ikonkalar, illyustratsiyalar
-  config/site.ts      # brend va mahsulotlar
+  components/         # modal oqimi, nav, karusel, ikonkalar, illyustratsiyalar
+  config/site.ts      # brend, mahsulotlar va qidiruv mantiqlari
   lib/analysis.ts     # MediaPipe + ko'z tahlili
 scripts/
   setup-assets.mjs    # postinstall: wasm + model tayyorlash
