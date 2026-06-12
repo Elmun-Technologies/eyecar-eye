@@ -62,7 +62,16 @@ export function validateProduct(v: unknown): Product | null {
   ) {
     return null;
   }
-  const image = typeof o.image === "string" && o.image ? o.image : undefined;
+  // Suratlar: yangi `images` massivi; eski yozuvlardagi `image` ham qabul
+  // qilinadi (migratsiya). Har biri https yoki lokal / bilan boshlanishi shart.
+  const validSrc = (s: unknown): s is string =>
+    typeof s === "string" && /^(https?:\/\/|\/)/.test(s);
+  let images: string[] = [];
+  if (Array.isArray(o.images)) {
+    images = o.images.filter(validSrc).slice(0, 8);
+  } else if (validSrc(o.image)) {
+    images = [o.image];
+  }
   // «#» kabi soxta havolalar saqlanmaydi — UI tugmani umuman ko'rsatmaydi
   const url =
     typeof o.url === "string" && /^https?:\/\//.test(o.url) ? o.url : undefined;
@@ -76,7 +85,7 @@ export function validateProduct(v: unknown): Product | null {
     features: o.features,
     scenes: o.scenes,
     recommendFor: o.recommendFor,
-    image,
+    images,
     url,
   };
 }

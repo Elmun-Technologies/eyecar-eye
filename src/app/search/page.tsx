@@ -84,6 +84,44 @@ function CheckSquare({
   );
 }
 
+/** Mahsulot suratlari: asosiy surat + bir nechta bo'lsa almashinadigan kichik suratlar */
+function ProductImages({ images, name }: { images: string[]; name: string }) {
+  const [idx, setIdx] = useState(0);
+  const current = images[Math.min(idx, images.length - 1)];
+  return (
+    <div className="w-2/5 shrink-0">
+      <span className="flex aspect-square w-full items-center justify-center rounded-2xl bg-white">
+        {current ? (
+          /* eslint-disable-next-line @next/next/no-img-element -- blob'dagi mahsulot surati */
+          <img
+            src={current}
+            alt={name}
+            className="max-h-full w-auto object-contain p-2"
+          />
+        ) : (
+          <DropBottleIcon className="h-14 w-14 text-foreground/70" />
+        )}
+      </span>
+      {images.length > 1 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {images.map((src, i) => (
+            <button
+              key={`${src}-${i}`}
+              onClick={() => setIdx(i)}
+              className={`overflow-hidden rounded-lg bg-white p-0.5 ${
+                i === idx ? "ring-2 ring-[#7b6ce4]" : "opacity-70"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- kichik surat */}
+              <img src={src} alt="" className="h-9 w-9 object-contain" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Salqinlik darajasi — originaldagidek 7 yulduzli shkala */
 function CoolingStars({ value, label }: { value: number; label: string }) {
   return (
@@ -218,18 +256,7 @@ export default function SearchPage() {
               >
                 <h2 className="text-center font-extrabold">{p.name}</h2>
                 <div className="mt-3 flex items-stretch gap-3">
-                  <span className="flex aspect-square w-2/5 shrink-0 items-center justify-center rounded-2xl bg-white">
-                    {p.image ? (
-                      /* eslint-disable-next-line @next/next/no-img-element -- lokal mahsulot surati */
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        className="max-h-full w-auto object-contain p-2"
-                      />
-                    ) : (
-                      <DropBottleIcon className="h-14 w-14 text-foreground/70" />
-                    )}
-                  </span>
+                  <ProductImages images={p.images ?? []} name={p.name} />
                   <div className="min-w-0 flex-1">
                     {p.features.includes("vitaminA") && (
                       <p className="rounded-xl bg-[#f29422] px-3 py-2 text-center text-xs font-extrabold leading-snug text-white">

@@ -40,6 +40,35 @@ const LEVELS: Array<{ id: Product["recommendFor"][number]; label: string }> = [
   { id: "attention", label: "E'tibor talab" },
 ];
 
+/**
+ * Telefon suratlari odatda 5–12 MB bo'ladi — yuklashdan oldin brauzerda
+ * kichraytiramiz (eng uzun tomoni 1200px, JPEG): server limiti 4 MB ga
+ * bemalol sig'adi va sayt tez ochiladi.
+ */
+async function compressImage(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file).catch(() => null);
+  if (!bitmap) {
+    throw new Error(
+      `«${file.name}» o'qib bo'lmadi — JPG, PNG yoki WebP formatda yuboring.`,
+    );
+  }
+  const maxSide = 1200;
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  // Kichik va shaffof bo'lmagan fayllarni o'zgartirmay yuboramiz
+  if (scale === 1 && file.size < 500 * 1024) return file;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  return new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("Suratni siqib bo'lmadi."))),
+      "image/jpeg",
+      0.85,
+    ),
+  );
+}
+
 function slugify(name: string): string {
   return (
     name
@@ -62,6 +91,7 @@ function emptyProduct(): Product {
     features: [],
     scenes: ["naked"],
     recommendFor: ["moderate"],
+    images: [],
     url: "",
   };
 }
@@ -171,27 +201,41 @@ function ProductEditor({
   onMove: (dir: -1 | 1) => void;
 }) {
   const [open, setOpen] = useState(product.name === "");
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const upload = async (file: File) => {
-    setUploading(true);
+  /** Bir nechta faylni ketma-ket siqib yuklaydi */
+  const uploadFiles = async (files: File[]) => {
     setUploadError(null);
-    try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: form,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "Yuklashda xatolik");
-      onChange({ ...product, image: data.url });
-    } catch (e) {
-      setUploadError(e instanceof Error ? e.message : "Yuklashda xatolik");
-    } finally {
-      setUploading(false);
+    const added: string[] = [];
+    const errors: string[] = [];
+    for (let i = 0; i < files.length; i++) {
+      setUploading(`${i + 1} / ${files.length} yuklanmoqda…`);
+      try {
+        const compressed = await compressImage(files[i]);
+        const form = new FormData();
+        form.append(
+          "file",
+          new File([compressed], "surat.jpg", {
+            type: compressed.type || "image/jpeg",
+          }),
+        );
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: form,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error ?? "Yuklashda xatolik");
+        added.push(data.url as string);
+      } catch (e) {
+        errors.push(e instanceof Error ? e.message : "Yuklashda xatolik");
+      }
     }
+    setUploading(null);
+    if (added.length) {
+      onChange({ ...product, images: [...(product.images ?? []), ...added] });
+    }
+    if (errors.length) setUploadError(errors.join(" "));
   };
 
   return (
@@ -310,48 +354,72 @@ function ProductEditor({
             onChange={(recommendFor) => onChange({ ...product, recommendFor })}
           />
 
-          {/* Surat */}
+          {/* Suratlar galereyasi */}
           <div>
             <span className="mb-1 block text-xs font-extrabold text-foreground/60">
-              Mahsulot surati
+              Mahsulot suratlari (birinchisi — asosiy, suratni bosib asosiy
+              qiling)
             </span>
-            <div className="flex items-center gap-3">
-              {product.image ? (
-                /* eslint-disable-next-line @next/next/no-img-element -- blob URL preview */
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="h-16 w-16 rounded-xl bg-white object-contain p-1"
-                />
-              ) : (
-                <span className="flex h-16 w-16 items-center justify-center rounded-xl bg-white text-xs font-bold text-foreground/40">
-                  Yo'q
-                </span>
-              )}
+            <div className="flex flex-wrap items-center gap-2">
+              {(product.images ?? []).map((src, idx) => (
+                <div key={`${src}-${idx}`} className="relative">
+                  <button
+                    type="button"
+                    title={idx === 0 ? "Asosiy surat" : "Asosiy qilish"}
+                    onClick={() => {
+                      if (idx === 0) return;
+                      const imgs = [...(product.images ?? [])];
+                      imgs.splice(idx, 1);
+                      onChange({ ...product, images: [src, ...imgs] });
+                    }}
+                    className={`block overflow-hidden rounded-xl bg-white p-1 ${
+                      idx === 0 ? "ring-2 ring-[#7b6ce4]" : "opacity-80"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- blob URL preview */}
+                    <img
+                      src={src}
+                      alt={`${product.name} ${idx + 1}`}
+                      className="h-16 w-16 object-contain"
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Suratni o'chirish"
+                    onClick={() =>
+                      onChange({
+                        ...product,
+                        images: (product.images ?? []).filter(
+                          (_, i) => i !== idx,
+                        ),
+                      })
+                    }
+                    className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-red text-xs font-bold text-white shadow"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
               <label className="cursor-pointer rounded-full bg-white px-4 py-2 text-sm font-bold shadow-sm">
-                {uploading ? "Yuklanmoqda…" : "Surat tanlash"}
+                {uploading ?? "+ Surat qo'shish"}
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
+                  multiple
                   className="hidden"
-                  disabled={uploading}
+                  disabled={uploading !== null}
                   onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) void upload(f);
+                    const files = Array.from(e.target.files ?? []);
+                    if (files.length) void uploadFiles(files);
                     e.target.value = "";
                   }}
                 />
               </label>
-              {product.image && (
-                <button
-                  type="button"
-                  onClick={() => onChange({ ...product, image: undefined })}
-                  className="text-sm font-bold text-brand-red"
-                >
-                  Olib tashlash
-                </button>
-              )}
             </div>
+            <p className="mt-1 text-[11px] text-foreground/50">
+              Bir nechta faylni birdaniga tanlash mumkin. Katta suratlar
+              avtomatik kichraytiriladi (≈1200px, JPEG).
+            </p>
             {uploadError && (
               <p className="mt-1 text-xs font-bold text-brand-red">
                 {uploadError}

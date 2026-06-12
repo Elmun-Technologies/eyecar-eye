@@ -48,8 +48,8 @@ export type Product = {
   scenes: SceneId[];
   /** Qaysi natija darajalarida tavsiya qilinadi */
   recommendFor: Array<"good" | "moderate" | "attention">;
-  /** public/ dagi mahsulot surati (hozircha yo'q — placeholder chiqadi) */
-  image?: string;
+  /** Mahsulot suratlari (birinchisi — asosiy); bo'sh bo'lsa placeholder chiqadi */
+  images?: string[];
   /** Tashqi sahifa (do'kon, brend sahifasi) */
   url?: string;
 };

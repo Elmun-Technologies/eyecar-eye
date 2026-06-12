@@ -14,9 +14,11 @@ tavsiya va «Smile» ko'z tomchilari taklif qilinadi.
 
 Mahsulotlarni distribyutor o'zi qo'shadi/tahrirlaydi: `/admin` sahifasi
 (hech qayerda havola ko'rsatilmaydi). Imkoniyatlar: mahsulot qo'shish,
-tahrirlash, o'chirish, tartibini o'zgartirish (karusel tartibi), surat
-yuklash (JPG/PNG/WebP, 4 MB gacha), ikkala tildagi tavsiflar, belgilar,
-salqinlik, xususiyatlar va havolalar.
+tahrirlash, o'chirish, tartibini o'zgartirish (karusel tartibi), **bir
+nechta surat** yuklash (birinchisi — asosiy; katta suratlar brauzerda
+avtomatik ≈1200px JPEG ga kichraytiriladi, shuning uchun telefon
+suratlarini ham bemalol tanlash mumkin), ikkala tildagi tavsiflar,
+belgilar, salqinlik, xususiyatlar va havolalar.
 
 Vercel'da yoqish (2 qadam, keyin Redeploy):
 
