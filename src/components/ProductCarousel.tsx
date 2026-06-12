@@ -70,10 +70,10 @@ export function ProductCarousel() {
           const card = (
             <>
               <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-b from-[#f6f3fb] to-[#ece4f6] p-4">
-                {p.image ? (
-                  /* eslint-disable-next-line @next/next/no-img-element -- lokal mahsulot surati */
+                {p.images?.[0] ? (
+                  /* eslint-disable-next-line @next/next/no-img-element -- blob'dagi mahsulot surati */
                   <img
-                    src={p.image}
+                    src={p.images[0]}
                     alt={p.name}
                     className="max-h-full w-auto object-contain"
                   />
