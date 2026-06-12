@@ -156,9 +156,10 @@ export const products: Product[] = [
 
 /** Natija darajasiga mos mahsulotlarni qaytaradi */
 export function recommendedProducts(
+  catalog: Product[],
   level: "good" | "moderate" | "attention",
 ): Product[] {
-  return products.filter((p) => p.recommendFor.includes(level));
+  return catalog.filter((p) => p.recommendFor.includes(level));
 }
 
 export type SearchCriteria = {
@@ -174,7 +175,10 @@ export type SearchCriteria = {
  * hech narsa topilmasa — faqat «eng bezovta qilgan belgi» bo'yicha
  * moslar qaytariladi (exact: false).
  */
-export function searchProducts(c: SearchCriteria): {
+export function searchProducts(
+  catalog: Product[],
+  c: SearchCriteria,
+): {
   products: Product[];
   exact: boolean;
 } {
@@ -187,7 +191,7 @@ export function searchProducts(c: SearchCriteria): {
           ? p.cooling >= 1 && p.cooling <= 3
           : p.cooling >= 4;
 
-  const strict = products.filter(
+  const strict = catalog.filter(
     (p) =>
       c.symptoms.every((s) => p.symptoms.includes(s)) &&
       p.symptoms.includes(c.primary) &&
@@ -198,7 +202,7 @@ export function searchProducts(c: SearchCriteria): {
   if (strict.length > 0) return { products: strict, exact: true };
 
   return {
-    products: products.filter((p) => p.symptoms.includes(c.primary)),
+    products: catalog.filter((p) => p.symptoms.includes(c.primary)),
     exact: false,
   };
 }

@@ -5,6 +5,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { BrandHeader } from "@/components/BrandHeader";
 import { DropBottleIcon } from "@/components/icons";
 import { useLang } from "@/lib/i18n";
+import { useProducts } from "@/lib/useProducts";
 import {
   searchProducts,
   type FeatureId,
@@ -107,6 +108,7 @@ function CoolingStars({ value, label }: { value: number; label: string }) {
 
 export default function SearchPage() {
   const { lang, t } = useLang();
+  const catalog = useProducts();
   const [stepIndex, setStepIndex] = useState(0);
   // Salqinlik va holat bosqichlarida originaldagidek «Farqi yo'q» oldindan tanlangan
   const [answers, setAnswers] = useState<Record<string, string[]>>({
@@ -169,7 +171,7 @@ export default function SearchPage() {
   };
 
   if (done) {
-    const { products: matched, exact } = searchProducts({
+    const { products: matched, exact } = searchProducts(catalog, {
       symptoms: (answers.symptoms ?? []) as SymptomId[],
       primary: (answers.primary?.[0] ?? "tired") as SymptomId,
       cooling: (answers.cooling?.[0] ?? "any") as

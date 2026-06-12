@@ -10,6 +10,28 @@ tavsiya va «Smile» ko'z tomchilari taklif qilinadi.
 > bosmaydi. Ilova ichidagi ogohlantirishlar shu sababli majburiy qism
 > hisoblanadi.
 
+## Boshqaruv paneli (`/admin`)
+
+Mahsulotlarni distribyutor o'zi qo'shadi/tahrirlaydi: `/admin` sahifasi
+(hech qayerda havola ko'rsatilmaydi). Imkoniyatlar: mahsulot qo'shish,
+tahrirlash, o'chirish, tartibini o'zgartirish (karusel tartibi), surat
+yuklash (JPG/PNG/WebP, 4 MB gacha), ikkala tildagi tavsiflar, belgilar,
+salqinlik, xususiyatlar va havolalar.
+
+Vercel'da yoqish (2 qadam, keyin Redeploy):
+
+1. **Settings → Environment Variables** — `ADMIN_PASSWORD` (kamida 8 belgi).
+   Parol o'rnatilmaguncha panelga kirish butunlay yopiq.
+2. **Storage → Create → Blob** — katalog `catalog/products.json` sifatida,
+   suratlar `products/` papkada Blob'da saqlanadi.
+
+Texnik jihatlar: katalog `/api/products` orqali o'qiladi; Blob ulanmagan
+yoki xato bo'lsa sayt `src/config/site.ts` dagi boshlang'ich ro'yxat bilan
+ishlayveradi. Sessiya — paroldan hosil qilingan HMAC, httpOnly cookie'da.
+Saqlangan o'zgarishlar saytda ~1 daqiqada ko'rinadi (CDN kesh).
+Eslatma: ko'z tahlili avvalgidek 100% brauzerda — serverga faqat mahsulot
+ma'lumotlari boradi, surat emas.
+
 ## Ikki tillilik (uz / ru)
 
 Ilova ikki tilda ishlaydi: birinchi kirishda foydalanuvchidan til so'raladi
@@ -58,8 +80,8 @@ npm run dev
 
 Kamera faqat **HTTPS** yoki `localhost` da ishlaydi. Telefonda sinash uchun
 `npm run dev` ni tunnel (masalan, ngrok / cloudflared) orqali oching yoki
-deploy qiling (Vercel va h.k.) — backend talab qilinmaydi, barcha sahifalar
-statik render bo'ladi.
+deploy qiling (Vercel). Sahifalar statik render bo'ladi; mahsulot katalogi
+va admin panel uchun yengil serverless API (`/api/*`) ishlatiladi.
 
 ### Skriptlar
 
@@ -118,13 +140,17 @@ CSS o'zgaruvchilari orqali (`tailwind.config` yo'q).
 
 ## Qilinishi kerak (distribyutor ma'lumotlari)
 
+Quyidagilarning hammasi endi `/admin` paneli orqali kiritiladi:
+
 - [ ] Aniq assortiment: karuselda originalda 7 mahsulot bor edi, hozircha
       5 tasi kiritilgan (THE ONE Mild va MediClear DX skrinshotlardan
       tasdiqlangan, qolganlari taxminiy)
-- [ ] Mahsulot suratlari (`public/products/` + `site.ts` dagi `image`)
+- [ ] Mahsulot suratlari (admin paneldan yuklanadi)
 - [ ] Haqiqiy do'kon/brend havolalari (`url` hozircha `#`)
 - [ ] Salqinlik darajalari va tavsiflarni qadoq bo'yicha tasdiqlash
-- [ ] Foydalanish shartlari (`/terms`) matnini yuridik tekshiruvdan o'tkazish
+
+Alohida: foydalanish shartlari (`/terms`) matnini yuridik tekshiruvdan
+o'tkazish.
 
 ## Tuzilma
 

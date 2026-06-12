@@ -23,7 +23,7 @@ No test framework is configured.
 
 ## Architecture
 
-There is no backend — capture, analysis, and result handoff are all client-side:
+Capture, analysis, and result handoff are all client-side; the only backend is a small serverless API for the product catalog and admin panel (see below). The captured image must never be sent to a server:
 
 1. `/` (home) — `CheckFlow.tsx` owns the pre-check modal sequence (disclaimer → remove glasses → face-in-frame → capture instructions) and only then navigates to `/check`.
 2. `/check` — opens the front camera, pre-warms the landmarker, runs a 3‑2‑1 countdown, draws the video frame onto a canvas, and calls `analyzeCapture()`. On success the `AnalysisResult` is stored in `sessionStorage` under `RESULT_STORAGE_KEY` and the page navigates to `/result`.
@@ -39,8 +39,14 @@ Everything measurable lives here, including all calibration constants:
 - Openness — EAR (eye aspect ratio) mapped from `[0.14, 0.34]` to 0–100.
 - `score = 100 − 0.7·redness − 0.3·(100−openness)`; level: ≥75 `good`, ≥50 `moderate`, otherwise `attention`. The `Level` union drives both the result verdict and product matching.
 
+### Product catalog and admin panel
+
+- The live catalog is stored in Vercel Blob (`catalog/products.json`, written by `saveCatalog()` in `src/lib/catalog.ts`); `src/config/site.ts` holds the seed list used as fallback whenever Blob is unconfigured (`BLOB_READ_WRITE_TOKEN` absent) or unreadable — the site must never end up productless. Client pages read via the `useProducts()` hook (renders seed first, then swaps in `/api/products` data; module-level cache).
+- `/admin` (Uzbek-only, unlinked, noindex) manages products: add/edit/delete/reorder + image upload to Blob (`/api/admin/upload`, 4 MB JPG/PNG/WebP). Auth is `ADMIN_PASSWORD` env (min 8 chars; login disabled when unset — no default password) with an HMAC-derived httpOnly cookie (`src/lib/adminAuth.ts`). `PUT /api/admin/products` replaces the whole catalog after `validateCatalog()`.
+- `searchProducts(catalog, criteria)` and `recommendedProducts(catalog, level)` take the catalog as a parameter — don't reintroduce module-level product reads.
+
 ### Configuration and theming
 
-- `src/config/site.ts` is the single source for the brand name, headline, taglines, and the product catalog (LION "Smile" eye-drop lineup — exact assortment/copy pending distributor confirmation); `recommendedProducts(level)` decides what `/info` recommends. Change brand/product copy here, not in pages.
+- `src/config/site.ts` is the single source for the brand name, headline, taglines, and the seed product catalog (LION "Smile" eye-drop lineup — exact assortment/copy pending distributor confirmation). Change brand copy here, not in pages.
 - Tailwind CSS v4 — there is no `tailwind.config`; design tokens are CSS variables in `src/app/globals.css` mapped through `@theme inline` to utility names (`brand-green`, `brand-red`, `accent-dark`, `surface`, `muted`, …). Shared effects (`dot-pattern`, `glow-card`, `bracketed`, pop-in/pulse animations) are defined there too.
 - Layout is mobile-first: every page constrains content to `max-w-md`.
