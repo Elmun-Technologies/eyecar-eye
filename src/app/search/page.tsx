@@ -2,74 +2,80 @@
 
 import { useState } from "react";
 import { BottomNav } from "@/components/BottomNav";
+import { BrandHeader } from "@/components/BrandHeader";
 import { DropBottleIcon } from "@/components/icons";
-import { matchProducts, type SymptomId } from "@/config/site";
+import {
+  searchProducts,
+  type FeatureId,
+  type SceneId,
+  type SymptomId,
+} from "@/config/site";
+
+const SYMPTOM_OPTIONS = [
+  { id: "tired", label: "Ko'z charchog'i" },
+  { id: "dry", label: "Quruq ko'z (ko'z qurishi)" },
+  { id: "blur", label: "Ko'z xiralashishi (yiring va h.k. sabab)" },
+  { id: "itch", label: "Ko'z qichishishi" },
+  { id: "red", label: "Ko'z qizarishi" },
+  { id: "contact", label: "Linza taqqandagi noqulaylik" },
+];
 
 type Step = {
-  id: string;
+  id: "symptoms" | "primary" | "cooling" | "scene" | "features";
   title: string;
   note?: string;
   multi: boolean;
+  /** Tanlovsiz davom etish mumkinmi */
+  optional?: boolean;
   options: Array<{ id: string; label: string }>;
 };
 
-/**
- * So'rovnoma bosqichlari. 1-bosqich original ilovaga mos;
- * 2–5 bosqichlar vaqtincha — original skrinshotlari kelganda almashtiriladi.
- */
+/** Originaldagi 5 bosqich */
 const STEPS: Step[] = [
   {
     id: "symptoms",
     title: "Bezovta qilayotgan belgilarni tanlang",
     note: "(bir nechtasini tanlash mumkin)",
     multi: true,
-    options: [
-      { id: "tired", label: "Ko'z charchog'i" },
-      { id: "dry", label: "Quruq ko'z (ko'z qurishi)" },
-      { id: "blur", label: "Ko'z xiralashishi (yiring ko'p bo'lganda)" },
-      { id: "itch", label: "Ko'z qichishishi" },
-      { id: "red", label: "Ko'z qizarishi" },
-      { id: "contact", label: "Linza taqqandagi noqulaylik" },
-    ],
+    options: SYMPTOM_OPTIONS,
   },
   {
-    id: "lens",
-    title: "Kontakt linza taqasizmi?",
+    id: "primary",
+    title: "Eng bezovta qilayotgan belgini tanlang",
     multi: false,
-    options: [
-      { id: "yes", label: "Ha, muntazam" },
-      { id: "sometimes", label: "Ba'zan" },
-      { id: "no", label: "Yo'q" },
-    ],
+    options: SYMPTOM_OPTIONS,
   },
   {
-    id: "age",
-    title: "Yoshingiz nechada?",
+    id: "cooling",
+    title: "Tomizish hissi (salqinlik)ni tanlang",
     multi: false,
     options: [
-      { id: "young", label: "30 gacha" },
-      { id: "mid", label: "30–44" },
-      { id: "senior", label: "45 va undan katta" },
-    ],
-  },
-  {
-    id: "screen",
-    title: "Kuniga ekran oldida qancha vaqt o'tkazasiz?",
-    multi: false,
-    options: [
-      { id: "low", label: "3 soatgacha" },
-      { id: "mid", label: "3–7 soat" },
-      { id: "high", label: "7 soatdan ko'p" },
-    ],
-  },
-  {
-    id: "feel",
-    title: "Tomchidan qanday his yoqadi?",
-    multi: false,
-    options: [
-      { id: "cool", label: "Kuchli salqinlik" },
+      { id: "any", label: "Farqi yo'q" },
+      { id: "none", label: "Salqinliksiz" },
       { id: "mild", label: "Yengil salqinlik" },
-      { id: "neutral", label: "Farqi yo'q / yumshoq" },
+      { id: "strong", label: "Kuchli salqinlik" },
+    ],
+  },
+  {
+    id: "scene",
+    title: "Foydalanish holatini tanlang",
+    multi: false,
+    options: [
+      { id: "any", label: "Farqi yo'q" },
+      { id: "naked", label: "Linzasiz (oddiy ko'zga)" },
+      { id: "soft", label: "Yumshoq kontakt linza taqqanda" },
+      { id: "hard", label: "Qattiq kontakt linza taqqanda" },
+    ],
+  },
+  {
+    id: "features",
+    title: "Mahsulot xususiyatlarini tanlang",
+    note: "(bir nechtasini tanlash mumkin)",
+    multi: true,
+    optional: true,
+    options: [
+      { id: "vitaminA", label: "A vitamini (shox parda tiklovchi komponent) bilan" },
+      { id: "preservativeFree", label: "Konservantsiz" },
     ],
   },
 ];
@@ -112,9 +118,45 @@ function CheckSquare({
   );
 }
 
+/** Salqinlik darajasi — originaldagidek 7 yulduzli shkala */
+function CoolingStars({ value }: { value: number }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-extrabold text-[#1f6fb5]">Salqinlik</span>
+      <span className="flex gap-0.5">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <svg key={i} viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
+            <path
+              d="M10 1.8 12.5 7l5.7.8-4.1 4 1 5.6L10 14.7l-5.1 2.7 1-5.6-4.1-4L7.5 7Z"
+              fill={i < value ? "#1f6fb5" : "#fff"}
+              stroke={i < value ? "#1a5e99" : "#b9c4d4"}
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ))}
+      </span>
+    </div>
+  );
+}
+
+function SearchHeader() {
+  return (
+    <header className="relative flex flex-col items-center gap-1.5 pt-2 text-center">
+      <DropBottleIcon className="h-12 w-12 text-foreground" />
+      <h1 className="text-xl font-extrabold">Ko'z tomchisi qidiruvi</h1>
+    </header>
+  );
+}
+
 export default function SearchPage() {
   const [stepIndex, setStepIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  // Salqinlik va holat bosqichlarida originaldagidek «Farqi yo'q» oldindan tanlangan
+  const [answers, setAnswers] = useState<Record<string, string[]>>({
+    cooling: ["any"],
+    scene: ["any"],
+    features: [],
+  });
   const [done, setDone] = useState(false);
 
   const step = STEPS[stepIndex];
@@ -138,41 +180,77 @@ export default function SearchPage() {
   };
 
   const restart = () => {
-    setAnswers({});
+    setAnswers({ cooling: ["any"], scene: ["any"], features: [] });
     setStepIndex(0);
     setDone(false);
   };
 
   if (done) {
-    const symptoms = (answers.symptoms ?? []) as SymptomId[];
-    const wearsLenses =
-      answers.lens?.[0] === "yes" || answers.lens?.[0] === "sometimes";
-    const matched = matchProducts(symptoms, wearsLenses);
+    const { products: matched, exact } = searchProducts({
+      symptoms: (answers.symptoms ?? []) as SymptomId[],
+      primary: (answers.primary?.[0] ?? "tired") as SymptomId,
+      cooling: (answers.cooling?.[0] ?? "any") as
+        | "any"
+        | "none"
+        | "mild"
+        | "strong",
+      scene: (answers.scene?.[0] ?? "any") as "any" | SceneId,
+      features: (answers.features ?? []) as FeatureId[],
+    });
 
     return (
       <>
-        <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-32 pt-8">
+        <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-4 pb-32 pt-5">
           <div className="dot-pattern pointer-events-none absolute inset-0" />
-          <header className="relative flex flex-col items-center gap-1.5 text-center">
-            <DropBottleIcon className="h-12 w-12 text-foreground" />
-            <h1 className="text-xl font-extrabold">
-              Sizga mos ko'z tomchilari
-            </h1>
-            <p className="text-sm text-foreground/65">
-              Javoblaringiz asosida quyidagi vositalarni tavsiya qilamiz.
-            </p>
-          </header>
+          <BrandHeader />
+          <div className="relative">
+            <SearchHeader />
+          </div>
+
+          <p className="relative mt-5 text-center text-[17px] font-extrabold leading-relaxed">
+            {exact ? (
+              <>
+                Shartlaringizga mos ko'z tomchilari{" "}
+                <span className="text-[#3f8fdc]">topildi:</span>
+              </>
+            ) : (
+              <>
+                Qidiruv shartlarining barchasiga mos tomchi topilmadi, ammo{" "}
+                <span className="text-[#3f8fdc]">
+                  «eng bezovta qilayotgan belgi»
+                </span>
+                ga mos tomchilar quyidagilar:
+              </>
+            )}
+          </p>
 
           <section className="relative mt-5 space-y-4">
             {matched.map((p) => (
-              <article key={p.id} className="rounded-3xl bg-surface p-5 shadow-sm">
-                <div className="flex items-center gap-4">
-                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-b from-[#e9ddf5] to-[#ddccf0]">
-                    <DropBottleIcon className="h-10 w-10 text-foreground" />
+              <article
+                key={p.id}
+                className="rounded-3xl bg-surface p-5 shadow-sm"
+              >
+                <h2 className="text-center font-extrabold">{p.name}</h2>
+                <div className="mt-3 flex items-stretch gap-3">
+                  <span className="flex aspect-square w-2/5 shrink-0 items-center justify-center rounded-2xl bg-white">
+                    {p.image ? (
+                      /* eslint-disable-next-line @next/next/no-img-element -- lokal mahsulot surati */
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        className="max-h-full w-auto object-contain p-2"
+                      />
+                    ) : (
+                      <DropBottleIcon className="h-14 w-14 text-foreground/70" />
+                    )}
                   </span>
-                  <div className="min-w-0">
-                    <h2 className="font-extrabold">{p.name}</h2>
-                    <p className="text-sm font-bold text-foreground/60">
+                  <div className="min-w-0 flex-1">
+                    {p.features.includes("vitaminA") && (
+                      <p className="rounded-xl bg-[#f29422] px-3 py-2 text-center text-xs font-extrabold leading-snug text-white">
+                        A vitamini (shox parda tiklovchi komponent) bilan
+                      </p>
+                    )}
+                    <p className="mt-2 text-sm font-bold leading-snug">
                       {p.short}
                     </p>
                   </div>
@@ -180,14 +258,31 @@ export default function SearchPage() {
                 <p className="mt-3 text-[15px] leading-relaxed">
                   {p.description}
                 </p>
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                  <CoolingStars value={p.cooling} />
+                  {p.features.includes("preservativeFree") && (
+                    <span className="rounded-full border border-foreground/25 px-3 py-1 text-xs font-bold text-foreground/70">
+                      Konservantsiz
+                    </span>
+                  )}
+                </div>
                 {p.url && (
                   <a
                     href={p.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-4 block w-full rounded-full bg-accent-dark py-3 text-center font-bold text-white transition hover:bg-accent-dark-hover"
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent-dark py-3.5 text-center font-bold text-white transition hover:bg-accent-dark-hover"
                   >
-                    Batafsil
+                    Mahsulot brend sahifasi
+                    <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5" aria-hidden>
+                      <path
+                        d="M9 5H5v14h14v-4M14 4h6v6M20 4 11 13"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </a>
                 )}
               </article>
@@ -198,7 +293,7 @@ export default function SearchPage() {
             onClick={restart}
             className="relative mt-6 w-full rounded-full border border-muted/60 py-3.5 font-bold text-muted transition hover:bg-black/5"
           >
-            Qaytadan boshlash
+            Qaytadan qidirish
           </button>
         </main>
         <BottomNav />
@@ -208,13 +303,12 @@ export default function SearchPage() {
 
   return (
     <>
-      <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-32 pt-8">
+      <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-32 pt-5">
         <div className="dot-pattern pointer-events-none absolute inset-0" />
-
-        <header className="relative flex flex-col items-center gap-1.5 text-center">
-          <DropBottleIcon className="h-12 w-12 text-foreground" />
-          <h1 className="text-xl font-extrabold">Ko'z tomchisi qidiruvi</h1>
-        </header>
+        <BrandHeader />
+        <div className="relative">
+          <SearchHeader />
+        </div>
 
         <div className="relative mt-6 flex items-start gap-2.5">
           <CheckSquare checked className="mt-0.5 h-7 w-7 shrink-0" />
@@ -233,8 +327,8 @@ export default function SearchPage() {
               <button
                 key={o.id}
                 onClick={() => toggle(o.id)}
-                className={`flex w-full items-center gap-3 rounded-full bg-white px-4 py-4 text-left text-[15px] font-bold shadow-sm transition active:scale-[0.98] ${
-                  checked ? "ring-2 ring-[#7b6ce4]" : ""
+                className={`flex w-full items-center gap-3 rounded-full px-4 py-4 text-left text-[15px] font-bold shadow-sm transition active:scale-[0.98] ${
+                  checked ? "bg-[#dcd6f2]" : "bg-white"
                 }`}
               >
                 <CheckSquare checked={checked} className="h-6 w-6 shrink-0" />
@@ -244,23 +338,29 @@ export default function SearchPage() {
           })}
         </div>
 
-        <button
-          onClick={next}
-          disabled={selected.length === 0}
-          className="relative mt-8 w-full rounded-full bg-accent-dark py-4 font-bold text-white transition hover:bg-accent-dark-hover disabled:opacity-50"
-        >
-          {stepIndex < STEPS.length - 1 ? "Keyingisi" : "Natijani ko'rish"}
-          &ensp;{stepIndex + 1} / {STEPS.length}
-        </button>
-
-        {stepIndex > 0 && (
+        <div className="relative mt-8 flex items-center gap-3">
+          {stepIndex > 0 && (
+            <button
+              onClick={() => setStepIndex(stepIndex - 1)}
+              className="shrink-0 rounded-full bg-[#ececf2] px-7 py-3.5 font-bold shadow-sm transition hover:bg-[#e2e2ea]"
+            >
+              Orqaga
+            </button>
+          )}
           <button
-            onClick={() => setStepIndex(stepIndex - 1)}
-            className="relative mt-3 w-full rounded-full border border-muted/60 py-3 font-bold text-muted transition hover:bg-black/5"
+            onClick={next}
+            disabled={!step.optional && selected.length === 0}
+            className="flex-1 rounded-full bg-accent-dark py-4 font-bold text-white transition hover:bg-accent-dark-hover disabled:opacity-50"
           >
-            Orqaga
+            {stepIndex < STEPS.length - 1 ? (
+              <>
+                Keyingisi&ensp;{stepIndex + 1} / {STEPS.length}
+              </>
+            ) : (
+              "Natijani ko'rish"
+            )}
           </button>
-        )}
+        </div>
       </main>
       <BottomNav />
     </>

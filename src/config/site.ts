@@ -25,6 +25,12 @@ export type SymptomId =
   | "red"
   | "contact";
 
+/** Foydalanish holati: linzasiz / yumshoq / qattiq linza bilan */
+export type SceneId = "naked" | "soft" | "hard";
+
+/** Mahsulot xususiyatlari (qidiruv filtri) */
+export type FeatureId = "vitaminA" | "preservativeFree";
+
 export type Product = {
   id: string;
   name: string;
@@ -32,6 +38,11 @@ export type Product = {
   description: string;
   /** Qaysi belgilarda tavsiya qilinadi (tomchi qidiruvi mosligi) */
   symptoms: SymptomId[];
+  /** Salqinlik darajasi, 0–7 (originaldagi 清涼感 yulduzlari) */
+  cooling: number;
+  features: FeatureId[];
+  /** Qaysi holatlarda tomizish mumkin */
+  scenes: SceneId[];
   /** Qaysi natija darajalarida tavsiya qilinadi */
   recommendFor: Array<"good" | "moderate" | "attention">;
   /** public/ dagi mahsulot surati (hozircha yo'q — placeholder chiqadi) */
@@ -42,17 +53,22 @@ export type Product = {
 
 /**
  * LION «Smile» liniyasi. Skrinshotlardan tasdiqlanganlari:
- * 40 Premium THE ONE Mild va 40 MediClear DX; qolganlari taxminiy —
- * aniq assortiment, matn va havolalarni distribyutor tasdiqlashi kerak.
+ * 40 Premium THE ONE Mild (salqinlik 2/7, A vitamini, konservantsiz)
+ * va 40 MediClear DX (konservantsiz). Qolgan qiymatlar taxminiy —
+ * aniq assortiment, salqinlik darajalari, matn va havolalarni
+ * distribyutor tasdiqlashi kerak.
  */
 export const products: Product[] = [
   {
     id: "smile-40-premium-the-one-mild",
     name: "Smile 40 Premium THE ONE Mild",
-    short: "Shox parda tiklanishi uchun flagman tomchi",
+    short: "Bitta tomchi — barcha asosiy belgilarga qarshi",
     description:
       "Ko'z charchog'i, xiralik, qizarish va qichishishning umumiy sababi bo'lgan shox parda shikastini tiklashga qaratilgan keng tarkibli tomchi.",
     symptoms: ["tired", "blur", "red", "itch"],
+    cooling: 2,
+    features: ["vitaminA", "preservativeFree"],
+    scenes: ["naked"],
     recommendFor: ["moderate", "attention"],
     url: "#",
   },
@@ -63,6 +79,9 @@ export const products: Product[] = [
     description:
       "Qichishish, qizarish va ko'z yiringi bezovta qilganda — B6, A va E vitaminlari hamda tabiiy yallig'lanishga qarshi komponent bilan. Konservantsiz.",
     symptoms: ["itch", "red", "blur"],
+    cooling: 4,
+    features: ["vitaminA", "preservativeFree"],
+    scenes: ["naked"],
     recommendFor: ["moderate", "attention"],
     url: "#",
   },
@@ -73,6 +92,9 @@ export const products: Product[] = [
     description:
       "Tarkibidagi A vitamini (retinol) shox parda yuzasining tabiiy tiklanishini qo'llab-quvvatlaydi — ekran oldida uzoq ishlaydiganlar uchun.",
     symptoms: ["dry", "tired", "blur"],
+    cooling: 1,
+    features: ["vitaminA"],
+    scenes: ["naked"],
     recommendFor: ["moderate", "attention"],
     url: "#",
   },
@@ -83,6 +105,9 @@ export const products: Product[] = [
     description:
       "Vitaminlar va aminokislotalar kompleksi ko'z charchog'ini yengillashtiradi va xiralikni kamaytirishga yordam beradi.",
     symptoms: ["tired", "blur", "itch"],
+    cooling: 5,
+    features: ["vitaminA"],
+    scenes: ["naked"],
     recommendFor: ["good", "moderate", "attention"],
     url: "#",
   },
@@ -93,6 +118,9 @@ export const products: Product[] = [
     description:
       "Kontakt linza taqqan holda ham ishlatish mumkin bo'lgan namlovchi tomchi — quruqshash va noqulaylikni yumshatadi.",
     symptoms: ["contact", "dry"],
+    cooling: 3,
+    features: ["preservativeFree"],
+    scenes: ["naked", "soft", "hard"],
     recommendFor: ["good", "moderate"],
     url: "#",
   },
@@ -105,18 +133,44 @@ export function recommendedProducts(
   return products.filter((p) => p.recommendFor.includes(level));
 }
 
-/** Tanlangan belgilarga eng mos tomchilarni saralab qaytaradi */
-export function matchProducts(
-  symptoms: SymptomId[],
-  wearsLenses: boolean,
-): Product[] {
-  const scored = products
-    .map((p) => {
-      let score = p.symptoms.filter((s) => symptoms.includes(s)).length;
-      if (wearsLenses && p.symptoms.includes("contact")) score += 2;
-      return { p, score };
-    })
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score);
-  return scored.length ? scored.map((x) => x.p) : products;
+export type SearchCriteria = {
+  symptoms: SymptomId[];
+  primary: SymptomId;
+  cooling: "any" | "none" | "mild" | "strong";
+  scene: "any" | SceneId;
+  features: FeatureId[];
+};
+
+/**
+ * Originaldagidek qidiruv: avval barcha shartlar bo'yicha qat'iy filtr;
+ * hech narsa topilmasa — faqat «eng bezovta qilgan belgi» bo'yicha
+ * moslar qaytariladi (exact: false).
+ */
+export function searchProducts(c: SearchCriteria): {
+  products: Product[];
+  exact: boolean;
+} {
+  const coolingOk = (p: Product) =>
+    c.cooling === "any"
+      ? true
+      : c.cooling === "none"
+        ? p.cooling === 0
+        : c.cooling === "mild"
+          ? p.cooling >= 1 && p.cooling <= 3
+          : p.cooling >= 4;
+
+  const strict = products.filter(
+    (p) =>
+      c.symptoms.every((s) => p.symptoms.includes(s)) &&
+      p.symptoms.includes(c.primary) &&
+      coolingOk(p) &&
+      (c.scene === "any" || p.scenes.includes(c.scene)) &&
+      c.features.every((f) => p.features.includes(f)),
+  );
+  if (strict.length > 0) return { products: strict, exact: true };
+
+  return {
+    products: products.filter((p) => p.symptoms.includes(c.primary)),
+    exact: false,
+  };
 }
