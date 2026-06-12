@@ -1,8 +1,17 @@
 /**
  * Natija sahifasidagi tushuntiruvchi sxema:
  * yosh (namlik) qatlami + shox parda → yon ko'rinishdagi ko'z bilan bog'langan.
+ * Yorliqlar tildan kelganligi uchun props orqali uzatiladi.
  */
-export function EyeLayerDiagram({ className }: { className?: string }) {
+export function EyeLayerDiagram({
+  className,
+  tearLabel,
+  corneaLines,
+}: {
+  className?: string;
+  tearLabel: string;
+  corneaLines: string[];
+}) {
   return (
     <svg viewBox="0 0 320 130" fill="none" className={className} aria-hidden>
       {/* qatlamlar qutisi */}
@@ -30,36 +39,42 @@ export function EyeLayerDiagram({ className }: { className?: string }) {
       <text
         x="38"
         y="71"
-        fontSize="20"
+        fontSize={tearLabel.length > 5 ? 14 : 20}
         fontWeight="800"
         fill="#17171f"
         textAnchor="middle"
         dominantBaseline="middle"
       >
-        Yosh
+        {tearLabel}
       </text>
-      <text
-        x="120"
-        y="71"
-        fontSize="17"
-        fontWeight="800"
-        fill="#17171f"
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        Shox
-      </text>
-      <text
-        x="120"
-        y="90"
-        fontSize="17"
-        fontWeight="800"
-        fill="#17171f"
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        parda
-      </text>
+      {corneaLines.length === 1 ? (
+        <text
+          x="120"
+          y="78"
+          fontSize="12.5"
+          fontWeight="800"
+          fill="#17171f"
+          textAnchor="middle"
+          dominantBaseline="middle"
+        >
+          {corneaLines[0]}
+        </text>
+      ) : (
+        corneaLines.map((line, i) => (
+          <text
+            key={line}
+            x="120"
+            y={i === 0 ? 71 : 90}
+            fontSize="17"
+            fontWeight="800"
+            fill="#17171f"
+            textAnchor="middle"
+            dominantBaseline="middle"
+          >
+            {line}
+          </text>
+        ))
+      )}
 
       {/* bog'lovchi chiziq va marker */}
       <path d="M156 65h84" stroke="#1d9db8" strokeWidth="2.5" />

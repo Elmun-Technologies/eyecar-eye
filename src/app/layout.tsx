@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import { site } from "@/config/site";
+import { LanguageProvider } from "@/lib/i18n";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -27,7 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uz" className={`${manrope.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

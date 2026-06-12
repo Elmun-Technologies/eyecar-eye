@@ -1,23 +1,43 @@
-# EyeCare — Ko'z tekshiruvi (MVP)
+# Smile — Shox parda tekshiruvi (MVP)
 
-AI yordamida 10 soniyada ko'z holatini tekshiradigan mobil-birinchi veb-ilova.
-Foydalanuvchi old kamera orqali suratga olinadi, ko'z sohasi aniqlanib,
-qizarish va ochiqlik darajasi baholanadi, so'ng qisqa tavsiya va sinovdan
-o'tgan davo vositalari taklif qilinadi.
+AI yordamida 10 soniyada ko'z holatini tekshiradigan mobil-birinchi veb-ilova —
+LION «Smile» shox parda tekshiruvi xizmatining o'zbekcha moslamasi (O'zbekistondagi
+rasmiy distribyutor uchun). Foydalanuvchi old kamera orqali suratga olinadi,
+ko'z sohasi aniqlanib, qizarish va ochiqlik darajasi baholanadi, so'ng qisqa
+tavsiya va «Smile» ko'z tomchilari taklif qilinadi.
 
 > ⚠️ Ushbu xizmat **tibbiy qurilma emas** — natijalar tashxis o'rnini
 > bosmaydi. Ilova ichidagi ogohlantirishlar shu sababli majburiy qism
 > hisoblanadi.
 
+## Ikki tillilik (uz / ru)
+
+Ilova ikki tilda ishlaydi: birinchi kirishda foydalanuvchidan til so'raladi
+(O'zbekcha / Русский), tanlov `localStorage` da saqlanadi va bosh sahifadagi
+UZ/RU tugmalari orqali keyin ham almashtiriladi. Barcha matnlar
+`src/lib/i18n.tsx` dagi lug'atlarda — sahifalarga matn yozilmaydi.
+Mahsulot tavsiflari `site.ts` da har ikkala tilda. Sahifalarda
+«Powered by Dr Schats» belgisi ko'rsatiladi.
+
 ## Oqim
 
-1. **Bosh sahifa** — ikkita asosiy tugma: «Ko'zni AI tekshiruvi» va «Davo vositalari»
+1. **Bosh sahifa** — ikkita asosiy tugma: «Ko'zni AI tekshiruvi» va «Ko'z tomchilari»
 2. **Ogohlantirish modali** — xizmat tibbiy qurilma emasligi, shartlarga rozilik
 3. **Yo'riqnoma (2 bosqich)** — ko'zoynakni yechish, yuzni yashil ramkaga joylashtirish
 4. **Kamera** — old kamera, yashil oval ramka, 3-2-1 hisob bilan surat olish
 5. **Tahlil** — MediaPipe Face Landmarker (to'liq brauzerda, rasm serverga yuborilmaydi)
 6. **Natija** — shox parda va namlik skorlari, 5 yulduzli umumiy baho, ko'z kesmalari
-7. **Ma'lumot sahifasi** — shox parda shikastlanishi haqida + davo vositasi tavsiyasi
+7. **Ma'lumot sahifasi** — belgilar ro'yxati, shox parda shikastlanishi va
+   A vitamini (gialuron kislota) haqida illyustratsiyalar bilan
+8. **Ko'z tomchilari** — suriladigan mahsulotlar karuseli (nuqtalar, strelkalar,
+   brend sahifasiga havola) + qidiruvga o'tish tugmasi
+9. **Tomchi qidiruvi** — originaldagi 5 bosqichli so'rovnoma:
+   belgilar (ko'p tanlov) → eng asosiy belgi → salqinlik hissi →
+   foydalanish holati (linza) → mahsulot xususiyatlari.
+   Natijada barcha shartlar bo'yicha qat'iy filtr ishlaydi; mos tomchi
+   topilmasa, «eng asosiy belgi»ga mos vositalar ko'rsatiladi.
+   Kartochkalarda A vitamini belgisi, 7 yulduzli salqinlik shkalasi va
+   «Konservantsiz» chipi bor.
 
 ## Texnologiyalar
 
@@ -82,8 +102,29 @@ surat va skorlar qurilmadan chiqmaydi.
 ## Sozlash
 
 Brend nomi, sarlavha va mahsulotlar ro'yxati bitta faylda: `src/config/site.ts`.
+Har bir mahsulotda qidiruv uchun maydonlar bor:
+
+| Maydon        | Ma'nosi                                              |
+| ------------- | ---------------------------------------------------- |
+| `symptoms`    | qaysi belgilarda tavsiya qilinadi                    |
+| `cooling`     | salqinlik darajasi, 0–7 (originaldagi yulduzlar)     |
+| `features`    | `vitaminA`, `preservativeFree`                       |
+| `scenes`      | `naked` / `soft` / `hard` (linza bilan moslik)       |
+| `image`       | mahsulot surati (`public/products/` ga joylang)      |
+| `url`         | do'kon yoki brend sahifasi havolasi                  |
+
 Ranglar va effektlar (Tailwind v4 tokenlari) — `src/app/globals.css` dagi
 CSS o'zgaruvchilari orqali (`tailwind.config` yo'q).
+
+## Qilinishi kerak (distribyutor ma'lumotlari)
+
+- [ ] Aniq assortiment: karuselda originalda 7 mahsulot bor edi, hozircha
+      5 tasi kiritilgan (THE ONE Mild va MediClear DX skrinshotlardan
+      tasdiqlangan, qolganlari taxminiy)
+- [ ] Mahsulot suratlari (`public/products/` + `site.ts` dagi `image`)
+- [ ] Haqiqiy do'kon/brend havolalari (`url` hozircha `#`)
+- [ ] Salqinlik darajalari va tavsiflarni qadoq bo'yicha tasdiqlash
+- [ ] Foydalanish shartlari (`/terms`) matnini yuridik tekshiruvdan o'tkazish
 
 ## Tuzilma
 
@@ -93,12 +134,14 @@ src/
     page.tsx          # bosh sahifa
     check/page.tsx    # kamera + suratga olish
     result/page.tsx   # tahlil natijasi (skorlar, yulduzlar)
-    info/page.tsx     # shox parda haqida + mahsulot CTA
-    products/page.tsx # davo vositalari
+    info/page.tsx     # shox parda + A vitamini haqida
+    products/page.tsx # ko'z tomchilari karuseli
+    search/page.tsx   # tomchi qidiruvi (5 bosqichli so'rovnoma)
     terms/page.tsx    # foydalanish shartlari
-  components/         # modal oqimi, nav, ikonkalar, illyustratsiyalar
-  config/site.ts      # brend va mahsulotlar
+  components/         # modal oqimi, nav, karusel, til darvozasi, illyustratsiyalar
+  config/site.ts      # brend, mahsulotlar (uz/ru) va qidiruv mantiqlari
   lib/analysis.ts     # MediaPipe + ko'z tahlili
+  lib/i18n.tsx        # uz/ru lug'atlari, LanguageProvider, til darvozasi
 scripts/
   setup-assets.mjs    # postinstall: wasm + model tayyorlash
 ```

@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-EyeCare — a mobile-first, Uzbek-language web app that "checks" eye health in ~10 seconds: the user takes a front-camera selfie, MediaPipe Face Landmarker locates the eyes **entirely in the browser** (the image never leaves the device — keep it that way; do not add server-side upload of captures), a heuristic scores redness and openness, and the result funnels into product recommendations. It is explicitly **not a medical device** — the UI repeats this disclaimer in several places; preserve those disclaimers when editing.
+Smile — Shox parda tekshiruvi: a mobile-first, Uzbek-language web app that "checks" eye health in ~10 seconds, built as the Uzbek adaptation of LION's Smile cornea-checker service for the official distributor in Uzbekistan (the product funnel sells LION "Smile" eye drops). The user takes a front-camera selfie, MediaPipe Face Landmarker locates the eyes **entirely in the browser** (the image never leaves the device — keep it that way; do not add server-side upload of captures), a heuristic scores redness and openness, and the result funnels into product recommendations. It is explicitly **not a medical device** — the UI repeats this disclaimer in several places; preserve those disclaimers when editing.
 
-All UI copy, error messages, and code comments are in Uzbek (`<html lang="uz">`).
+The UI is being matched to screenshots of the original Japanese app (eyecare-app.lion-apps.jp) supplied by the owner; visual details (green oval camera frame, score bars, star rating, "scroll ♡" hint, squircle bottom nav) intentionally mirror it. Original photos/text are not copied — illustrations are stylized SVGs and all copy is original Uzbek.
+
+The UI is bilingual (Uzbek/Russian): all copy lives in the dictionaries in `src/lib/i18n.tsx` (`LanguageProvider` + `useLang()`); never hardcode UI strings in pages/components. The chosen language is stored in `localStorage` (`smile-lang`); on first visit `LanguageGate` blocks the app until a language is picked. SSR prerenders Uzbek (`<html lang="uz">`, updated client-side). Product copy (`short`/`description`) is localized per-product in `site.ts` via the `Localized` type. Code comments are in Uzbek. A "Powered by Dr Schats" mark (`PoweredBy`) appears on the home, terms, result pages and the language gate — keep it.
 
 ## Commands
 
@@ -25,7 +27,8 @@ There is no backend — capture, analysis, and result handoff are all client-sid
 
 1. `/` (home) — `CheckFlow.tsx` owns the pre-check modal sequence (disclaimer → remove glasses → face-in-frame → capture instructions) and only then navigates to `/check`.
 2. `/check` — opens the front camera, pre-warms the landmarker, runs a 3‑2‑1 countdown, draws the video frame onto a canvas, and calls `analyzeCapture()`. On success the `AnalysisResult` is stored in `sessionStorage` under `RESULT_STORAGE_KEY` and the page navigates to `/result`.
-3. `/result` — reads the result from `sessionStorage` after mount (redirects to `/` if missing), renders cornea/moisture score bars, a star rating, and per-eye crops (dataURL JPEGs), then links onward to `/info` (cornea info + product CTA) and `/products`.
+3. `/result` — reads the result from `sessionStorage` after mount (redirects to `/` if missing), renders cornea/moisture score bars, a star rating, and per-eye crops (dataURL JPEGs).
+4. The funnel continues `/result` → `/info` (cornea damage + Vitamin A explainer, inline stylized SVG illustrations) → `/products` (product carousel, `ProductCarousel.tsx`, scroll-snap with dots/arrows) → `/search` (5-step eye-drop finder wizard mirroring the original: symptoms multi-select → primary symptom → cooling feel → usage scene → product features). Results come from `searchProducts()`: strict AND filter over all criteria, falling back to primary-symptom matches with a "nothing matched everything" message when empty. Product `cooling` is the original's 0–7 star scale. The bottom nav's third item points to `/search`.
 
 ### `src/lib/analysis.ts` — the analysis core
 
@@ -38,6 +41,6 @@ Everything measurable lives here, including all calibration constants:
 
 ### Configuration and theming
 
-- `src/config/site.ts` is the single source for the brand name, headline, taglines, and the product catalog; `recommendedProducts(level)` decides what `/info` recommends. Change brand/product copy here, not in pages.
+- `src/config/site.ts` is the single source for the brand name, headline, taglines, and the product catalog (LION "Smile" eye-drop lineup — exact assortment/copy pending distributor confirmation); `recommendedProducts(level)` decides what `/info` recommends. Change brand/product copy here, not in pages.
 - Tailwind CSS v4 — there is no `tailwind.config`; design tokens are CSS variables in `src/app/globals.css` mapped through `@theme inline` to utility names (`brand-green`, `brand-red`, `accent-dark`, `surface`, `muted`, …). Shared effects (`dot-pattern`, `glow-card`, `bracketed`, pop-in/pulse animations) are defined there too.
 - Layout is mobile-first: every page constrains content to `max-w-md`.

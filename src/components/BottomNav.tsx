@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useLang } from "@/lib/i18n";
 import { EyeScanIcon, DropBottleIcon } from "./icons";
 
 function HomeIcon({ className }: { className?: string }) {
@@ -17,16 +20,17 @@ function HomeIcon({ className }: { className?: string }) {
 
 /** Natija/ma'lumot sahifalaridagi qotirilgan pastki menyu */
 export function BottomNav() {
+  const { t } = useLang();
   const items = [
-    { href: "/", label: "Bosh sahifa", icon: <HomeIcon className="h-7 w-7" /> },
+    { href: "/", label: t.nav.home, icon: <HomeIcon className="h-7 w-7" /> },
     {
       href: "/check",
-      label: "Ko'zni AI tekshiruvi",
+      label: t.nav.check,
       icon: <EyeScanIcon className="h-7 w-7" />,
     },
     {
-      href: "/products",
-      label: "Davo vositalari",
+      href: "/search",
+      label: t.nav.search,
       icon: <DropBottleIcon className="h-7 w-7" />,
     },
   ];

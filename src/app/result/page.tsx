@@ -8,24 +8,22 @@ import { EyeScanIcon } from "@/components/icons";
 import { BrandHeader } from "@/components/BrandHeader";
 import { BottomNav } from "@/components/BottomNav";
 import { EyeLayerDiagram } from "@/components/EyeLayerDiagram";
+import { PoweredBy } from "@/components/PoweredBy";
+import { useLang } from "@/lib/i18n";
 import { RESULT_STORAGE_KEY, type AnalysisResult } from "@/lib/analysis";
-
-const STAR_VERDICT: Record<number, string> = {
-  5: "Ajoyib! Ko'zingiz holati juda yaxshi.",
-  4: "Yaxshi holat — dam olishni unutmang.",
-  3: "Ko'zingizni ortiqcha zo'riqtirayotgan bo'lishingiz mumkin.",
-  2: "Ko'z charchog'i sezilarli — parvarish talab etiladi.",
-  1: "Ko'zingiz holatiga jiddiy e'tibor bering.",
-};
 
 function ScoreBar({
   icon,
   label,
   value,
+  lowText,
+  highText,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
+  lowText: string;
+  highText: string;
 }) {
   const low = value < 50;
   return (
@@ -39,7 +37,7 @@ function ScoreBar({
           className="text-sm font-extrabold"
           style={{ color: low ? "#c0392b" : "#1f6fb5" }}
         >
-          {low ? "O'rtachadan pastroq" : "O'rtachadan yuqoriroq"}
+          {low ? lowText : highText}
         </span>
       </div>
       <div className="mt-2 h-4 overflow-hidden rounded-full bg-white shadow-inner">
@@ -79,6 +77,19 @@ function Stars({ filled }: { filled: number }) {
   );
 }
 
+function HeartIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
+      <path
+        d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6 3.5 7 5.5 5 8 5c1.6 0 3.1.8 4 2.1C12.9 5.8 14.4 5 16 5c2.5 0 4.5 2 4.5 4.6 0 3.7-3.5 6.9-8.5 10.9Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function TearDropIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
@@ -94,6 +105,7 @@ function TearDropIcon({ className }: { className?: string }) {
 
 export default function ResultPage() {
   const router = useRouter();
+  const { t } = useLang();
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [missing, setMissing] = useState(false);
 
@@ -135,39 +147,46 @@ export default function ResultPage() {
         {/* Asosiy natija kartasi */}
         <section className="relative mt-4 rounded-3xl bg-surface p-5 shadow-sm">
           <h1 className="text-center text-lg font-extrabold">
-            Ko'zni AI tekshiruvi natijasi
+            {t.result.title}
           </h1>
 
           <div className="mt-5 space-y-5">
             <ScoreBar
               icon={<EyeScanIcon className="h-5 w-5 text-[#1d9db8]" />}
-              label="Shox parda skori"
+              label={t.result.corneaScore}
               value={corneaScore}
+              lowText={t.result.belowAvg}
+              highText={t.result.aboveAvg}
             />
             <ScoreBar
               icon={<TearDropIcon className="h-5 w-5 text-[#1f6fb5]" />}
-              label="Namlik skori"
+              label={t.result.tearScore}
               value={tearScore}
+              lowText={t.result.belowAvg}
+              highText={t.result.aboveAvg}
             />
           </div>
 
-          <EyeLayerDiagram className="mx-auto mt-6 w-full max-w-[320px]" />
+          <EyeLayerDiagram
+            className="mx-auto mt-6 w-full max-w-[320px]"
+            tearLabel={t.result.diagramTear}
+            corneaLines={[...t.result.diagramCornea]}
+          />
 
           {/* Umumiy baho */}
           <div className="mt-6 rounded-2xl bg-white p-5">
             <h2 className="text-center text-lg font-extrabold">
-              Ko'zning umumiy bahosi
+              {t.result.totalTitle}
             </h2>
             <div className="mt-3">
               <Stars filled={stars} />
             </div>
             <p className="mt-3 text-center text-[15px] leading-relaxed">
-              <span className="font-extrabold">«{stars} yulduz»</span>{" "}
-              {STAR_VERDICT[stars]}
+              <span className="font-extrabold">{t.result.starsWord(stars)}</span>{" "}
+              {t.result.verdicts[stars]}
             </p>
             <p className="mt-3 text-xs leading-relaxed text-foreground/65">
-              ※ Umumiy baho shox parda va namlik skorlari kabi ko'z bilan
-              bog'liq ko'rsatkichlardan jamlab hisoblanadi.
+              {t.result.note}
             </p>
           </div>
 
@@ -175,8 +194,8 @@ export default function ResultPage() {
           <div className="mt-4 grid grid-cols-2 gap-3">
             {(
               [
-                ["O'ng ko'z", result.right],
-                ["Chap ko'z", result.left],
+                [t.result.rightEye, result.right],
+                [t.result.leftEye, result.left],
               ] as const
             ).map(([label, eye]) => (
               <figure key={label} className="rounded-2xl bg-white p-2.5">
@@ -196,19 +215,30 @@ export default function ResultPage() {
             href="/info"
             className="mt-6 block w-full rounded-full bg-accent-dark py-4 text-center font-bold text-white transition hover:bg-accent-dark-hover"
           >
-            Keyingisi
+            {t.common.next}
           </Link>
+
+          {/* Pastga aylantirish ishorasi */}
+          <div
+            className="animate-bob mt-3 flex flex-col items-center text-[#f06ba8]"
+            aria-hidden
+          >
+            <span className="text-lg font-extrabold lowercase tracking-widest [text-shadow:0_0_6px_#fff,0_0_12px_#ffd1e6]">
+              scroll
+            </span>
+            <HeartIcon className="-mt-0.5 h-5 w-5" />
+          </div>
         </section>
 
         {/* Ogohlantirish */}
         <p className="relative mt-4 rounded-2xl bg-white/70 p-4 text-xs leading-relaxed text-foreground/70">
-          Ushbu xizmat{" "}
+          {t.result.disclaimerPre}{" "}
           <span className="font-bold text-brand-red">
-            tibbiy qurilma hisoblanmaydi
+            {t.result.disclaimerBold}
           </span>{" "}
-          va natijalar tashxis o'rnini bosmaydi. Belgilar uzoq davom etsa,
-          tibbiyot muassasasiga murojaat qiling.
+          {t.result.disclaimerPost}
         </p>
+        <PoweredBy className="relative mt-4" />
       </main>
       <BottomNav />
     </>
