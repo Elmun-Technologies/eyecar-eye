@@ -194,7 +194,9 @@ export default function SearchPage() {
           </header>
 
           <p className="relative mt-5 text-center text-[17px] font-extrabold leading-relaxed">
-            {exact ? (
+            {matched.length === 0 ? (
+              t.search.empty
+            ) : exact ? (
               <>
                 {t.search.exact1}{" "}
                 <span className="text-[#3f8fdc]">{t.search.exactBlue}</span>
@@ -250,7 +252,8 @@ export default function SearchPage() {
                     </span>
                   )}
                 </div>
-                {p.url && (
+                {/* Tugma faqat haqiqiy havola bo'lganda chiqadi — soxta «#» yo'q */}
+                {p.url && p.url !== "#" && (
                   <a
                     href={p.url}
                     target="_blank"

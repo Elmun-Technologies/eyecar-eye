@@ -66,14 +66,9 @@ export function ProductCarousel() {
         onScroll={onScroll}
         className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {products.map((p) => (
-          <div key={p.id} className="w-full shrink-0 snap-center px-1">
-            <a
-              href={p.url ?? "#"}
-              target="_blank"
-              rel="noreferrer"
-              className="block rounded-2xl bg-white p-4 shadow-sm transition active:scale-[0.98]"
-            >
+        {products.map((p) => {
+          const card = (
+            <>
               <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-b from-[#f6f3fb] to-[#ece4f6] p-4">
                 {p.image ? (
                   /* eslint-disable-next-line @next/next/no-img-element -- lokal mahsulot surati */
@@ -83,24 +78,41 @@ export function ProductCarousel() {
                     className="max-h-full w-auto object-contain"
                   />
                 ) : (
-                  <>
-                    <DropBottleIcon className="h-16 w-16 text-foreground/80" />
-                    <p className="text-center font-extrabold leading-snug">
-                      {p.name}
-                    </p>
-                    <p className="text-center text-xs font-bold text-foreground/55">
-                      {p.short[lang]}
-                    </p>
-                  </>
+                  <DropBottleIcon className="h-16 w-16 text-foreground/80" />
                 )}
               </div>
-              <p className="mt-3 flex items-center justify-center gap-2 text-center text-sm font-bold">
-                {t.products.tap}
-                <ExternalIcon className="h-5 w-5 shrink-0" />
+              <p className="mt-3 text-center font-extrabold leading-snug">
+                {p.name}
               </p>
-            </a>
-          </div>
-        ))}
+              <p className="mt-0.5 text-center text-xs font-bold text-foreground/55">
+                {p.short[lang]}
+              </p>
+              {/* Havola da'vosi faqat haqiqiy URL bo'lganda ko'rsatiladi */}
+              {p.url && (
+                <p className="mt-2 flex items-center justify-center gap-2 text-center text-sm font-bold">
+                  {t.products.tap}
+                  <ExternalIcon className="h-5 w-5 shrink-0" />
+                </p>
+              )}
+            </>
+          );
+          return (
+            <div key={p.id} className="w-full shrink-0 snap-center px-1">
+              {p.url ? (
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block rounded-2xl bg-white p-4 shadow-sm transition active:scale-[0.98]"
+                >
+                  {card}
+                </a>
+              ) : (
+                <div className="rounded-2xl bg-white p-4 shadow-sm">{card}</div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {active > 0 && (

@@ -63,7 +63,9 @@ export function validateProduct(v: unknown): Product | null {
     return null;
   }
   const image = typeof o.image === "string" && o.image ? o.image : undefined;
-  const url = typeof o.url === "string" && o.url ? o.url : undefined;
+  // «#» kabi soxta havolalar saqlanmaydi — UI tugmani umuman ko'rsatmaydi
+  const url =
+    typeof o.url === "string" && /^https?:\/\//.test(o.url) ? o.url : undefined;
   return {
     id: o.id,
     name: o.name.trim(),
