@@ -18,7 +18,9 @@ tavsiya va «Smile» ko'z tomchilari taklif qilinadi.
 4. **Kamera** — old kamera, yashil oval ramka, 3-2-1 hisob bilan surat olish
 5. **Tahlil** — MediaPipe Face Landmarker (to'liq brauzerda, rasm serverga yuborilmaydi)
 6. **Natija** — shox parda va namlik skorlari, 5 yulduzli umumiy baho, ko'z kesmalari
-7. **Ma'lumot sahifasi** — shox parda shikastlanishi haqida + ko'z tomchisi tavsiyasi
+7. **Ma'lumot sahifasi** — shox parda shikastlanishi va A vitamini haqida
+8. **Ko'z tomchilari** — mahsulotlar karuseli (brend sahifasiga havola)
+9. **Tomchi qidiruvi** — 5 bosqichli so'rovnoma, belgilarga mos tomchini tanlaydi
 
 ## Texnologiyalar
 
@@ -94,8 +96,9 @@ src/
     page.tsx          # bosh sahifa
     check/page.tsx    # kamera + suratga olish
     result/page.tsx   # tahlil natijasi (skorlar, yulduzlar)
-    info/page.tsx     # shox parda haqida + mahsulot CTA
-    products/page.tsx # ko'z tomchilari
+    info/page.tsx     # shox parda + A vitamini haqida
+    products/page.tsx # ko'z tomchilari karuseli
+    search/page.tsx   # tomchi qidiruvi (5 bosqichli so'rovnoma)
     terms/page.tsx    # foydalanish shartlari
   components/         # modal oqimi, nav, ikonkalar, illyustratsiyalar
   config/site.ts      # brend va mahsulotlar

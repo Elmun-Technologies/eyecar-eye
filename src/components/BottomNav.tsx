@@ -25,8 +25,8 @@ export function BottomNav() {
       icon: <EyeScanIcon className="h-7 w-7" />,
     },
     {
-      href: "/products",
-      label: "Ko'z tomchilari",
+      href: "/search",
+      label: "Tomchi qidiruvi",
       icon: <DropBottleIcon className="h-7 w-7" />,
     },
   ];
