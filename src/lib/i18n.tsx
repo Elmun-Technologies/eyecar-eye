@@ -70,12 +70,18 @@ const uz = {
     retry: "Qayta urinish",
     notReady: "Kamera tayyor emas, qayta urinib ko'ring.",
     noFace:
-      "Yuz aniqlanmadi. Yorug'roq joyda, yuzingizni ramka ichiga to'liq joylashtirib qayta urining.",
+      "Yuz aniqlanmadi. Iltimos, yuzingiz to'liq ko'rinsin — yorug'roq joyda, ramka ichiga joylashtirib qayta urining.",
+    facePartial:
+      "Yuzingiz to'liq ko'rinmayapti. Iltimos, yuzingizni (ikkala ko'z bilan) ramka ichiga to'liq joylashtirib, qayta urining.",
     analyzeError: "Tahlil vaqtida xatolik yuz berdi. Qayta urinib ko'ring.",
     analyzing: "AI tahlil qilmoqda…",
     starting: "Kamera yoqilmoqda…",
     hintPost: "tugmasiga qarab, ko'zingizni katta oching va tugmani bosing.",
     capture: "Suratga olish",
+    qrTitle: "Tekshiruvni telefonda davom ettiring",
+    qrText:
+      "Bu tekshiruv telefonning old kamerasiga mo'ljallangan. Telefon kamerasi bilan QR kodni skanerlang — tekshiruv telefonda davom etadi.",
+    qrContinue: "Baribir kompyuter kamerasida davom etish",
   },
   result: {
     title: "Ko'zni AI tekshiruvi natijasi",
@@ -314,12 +320,18 @@ const ru: Dict = {
     retry: "Попробовать снова",
     notReady: "Камера не готова, попробуйте ещё раз.",
     noFace:
-      "Лицо не распознано. Повторите попытку в более освещённом месте, полностью поместив лицо в рамку.",
+      "Лицо не распознано. Пожалуйста, убедитесь, что лицо видно полностью — повторите в более освещённом месте, поместив лицо в рамку.",
+    facePartial:
+      "Лицо видно не полностью. Пожалуйста, полностью поместите лицо (с обоими глазами) в рамку и попробуйте ещё раз.",
     analyzeError: "Во время анализа произошла ошибка. Попробуйте ещё раз.",
     analyzing: "ИИ анализирует…",
     starting: "Камера включается…",
     hintPost: "— смотрите на эту кнопку, широко откройте глаза и нажмите её.",
     capture: "Сделать снимок",
+    qrTitle: "Продолжите проверку на телефоне",
+    qrText:
+      "Проверка рассчитана на фронтальную камеру телефона. Отсканируйте QR-код камерой телефона — проверка продолжится там.",
+    qrContinue: "Всё равно продолжить с камерой компьютера",
   },
   result: {
     title: "Результат AI-проверки глаз",

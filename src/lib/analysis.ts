@@ -31,6 +31,14 @@ export class NoFaceError extends Error {
   }
 }
 
+/** Yuz topildi, lekin kadrda to'liq emas yoki juda uzoq/kichik */
+export class FacePartialError extends Error {
+  constructor() {
+    super("Yuz to'liq ko'rinmayapti");
+    this.name = "FacePartialError";
+  }
+}
+
 export const RESULT_STORAGE_KEY = "eyecheck-result";
 
 // MediaPipe FaceMesh kontur indekslari
@@ -213,6 +221,29 @@ export async function analyzeCapture(
   const detection = landmarker.detect(canvas);
   const landmarks = detection.faceLandmarks[0];
   if (!landmarks) throw new NoFaceError();
+
+  // Ko'z sohalari kadr ichida to'liq bo'lishi shart — chetga chiqib ketgan
+  // yoki juda uzoqdagi yuz bo'yicha o'lchash ishonchsiz bo'ladi
+  const eyeIdx = [
+    ...RIGHT_EYE,
+    ...LEFT_EYE,
+    RIGHT_IRIS.center,
+    ...RIGHT_IRIS.edges,
+    LEFT_IRIS.center,
+    ...LEFT_IRIS.edges,
+  ];
+  for (const i of eyeIdx) {
+    const lm = landmarks[i];
+    if (lm.x < 0.03 || lm.x > 0.97 || lm.y < 0.03 || lm.y > 0.97) {
+      throw new FacePartialError();
+    }
+  }
+  // Ko'zlar orasi (yuz masshtabi): juda kichik bo'lsa, yuz juda uzoqda
+  const eyeSpan = Math.hypot(
+    landmarks[33].x - landmarks[263].x,
+    landmarks[33].y - landmarks[263].y,
+  );
+  if (eyeSpan < 0.14) throw new FacePartialError();
 
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   const w = canvas.width;
