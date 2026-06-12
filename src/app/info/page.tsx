@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BrandHeader } from "@/components/BrandHeader";
 import { BottomNav } from "@/components/BottomNav";
 import { useLang } from "@/lib/i18n";
+import { RESULT_STORAGE_KEY } from "@/lib/analysis";
 
 function CheckBadge({ className }: { className?: string }) {
   return (
@@ -387,6 +389,13 @@ function HyaluronCells({
 
 export default function InfoPage() {
   const { t } = useLang();
+  // «Natijaga qaytish» tugmasi faqat saqlangan natija bor bo'lsa chiqadi —
+  // aks holda u bosh sahifaga uloqtirib, foydalanuvchini chalg'itadi
+  const [hasResult, setHasResult] = useState(false);
+  useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage faqat klientda */
+    setHasResult(Boolean(sessionStorage.getItem(RESULT_STORAGE_KEY)));
+  }, []);
   return (
     <>
       <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-4 pb-32 pt-5">
@@ -500,13 +509,15 @@ export default function InfoPage() {
 
           {/* Pastki tugmalar */}
           <div className="mt-6 flex items-center gap-3">
-            <Link
-              href="/result"
-              className="flex shrink-0 flex-col items-center justify-center rounded-full bg-white px-5 py-2.5 text-[13px] font-bold leading-tight shadow-sm transition hover:bg-white/70"
-            >
-              <span>{t.info.backL1}</span>
-              <span>{t.info.backL2}</span>
-            </Link>
+            {hasResult && (
+              <Link
+                href="/result"
+                className="flex shrink-0 flex-col items-center justify-center rounded-full bg-white px-5 py-2.5 text-[13px] font-bold leading-tight shadow-sm transition hover:bg-white/70"
+              >
+                <span>{t.info.backL1}</span>
+                <span>{t.info.backL2}</span>
+              </Link>
+            )}
             <Link
               href="/products"
               className="flex-1 rounded-full bg-accent-dark py-4 text-center font-bold text-white transition hover:bg-accent-dark-hover"

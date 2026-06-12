@@ -18,6 +18,7 @@ export default function CheckPage() {
   const { t } = useLang();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [phase, setPhase] = useState<Phase>("init");
   const [count, setCount] = useState(3);
   const [message, setMessage] = useState<string | null>(null);
@@ -55,6 +56,8 @@ export default function CheckPage() {
     return () => {
       cancelled = true;
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      // Sahifadan chiqilganda hisob ham to'xtaydi
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
 
@@ -95,10 +98,11 @@ export default function CheckPage() {
     setMessage(null);
     let c = 3;
     setCount(c);
-    const timer = setInterval(() => {
+    timerRef.current = setInterval(() => {
       c -= 1;
       if (c === 0) {
-        clearInterval(timer);
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = null;
         void capture();
       } else {
         setCount(c);

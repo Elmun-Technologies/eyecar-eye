@@ -140,13 +140,14 @@ CSS o'zgaruvchilari orqali (`tailwind.config` yo'q).
 
 ## Qilinishi kerak (distribyutor ma'lumotlari)
 
-Quyidagilarning hammasi endi `/admin` paneli orqali kiritiladi:
+Boshlang'ich katalogda faqat skrinshotlardan tasdiqlangan 2 mahsulot bor
+(THE ONE Mild, MediClear DX) — taxminiy yozuvlar ataylab yo'q. Qolganlari
+`/admin` paneli orqali kiritiladi:
 
-- [ ] Aniq assortiment: karuselda originalda 7 mahsulot bor edi, hozircha
-      5 tasi kiritilgan (THE ONE Mild va MediClear DX skrinshotlardan
-      tasdiqlangan, qolganlari taxminiy)
+- [ ] Qolgan assortiment (originalda karuselda 7 mahsulot bor edi)
 - [ ] Mahsulot suratlari (admin paneldan yuklanadi)
-- [ ] Haqiqiy do'kon/brend havolalari (`url` hozircha `#`)
+- [ ] Do'kon/brend havolalari — havola kiritilmagan mahsulotda tugma
+      umuman ko'rsatilmaydi (soxta havola yo'q)
 - [ ] Salqinlik darajalari va tavsiflarni qadoq bo'yicha tasdiqlash
 
 Alohida: foydalanish shartlari (`/terms`) matnini yuridik tekshiruvdan

@@ -55,11 +55,11 @@ export type Product = {
 };
 
 /**
- * LION «Smile» liniyasi. Skrinshotlardan tasdiqlanganlari:
- * 40 Premium THE ONE Mild (salqinlik 2/7, A vitamini, konservantsiz)
- * va 40 MediClear DX (konservantsiz). Qolgan qiymatlar taxminiy —
- * aniq assortiment, salqinlik darajalari, matn va havolalarni
- * distribyutor tasdiqlashi kerak.
+ * Boshlang'ich (seed) katalog — faqat original ilova skrinshotlaridan
+ * tasdiqlangan mahsulotlar. Taxminiy/soxta yozuvlar ataylab yo'q:
+ * qolgan assortiment, suratlar va havolalarni distribyutor /admin
+ * paneli orqali kiritadi. `url` faqat haqiqiy havola bo'lsa to'ldiriladi —
+ * bo'sh qoldirilsa UI havola tugmalarini umuman ko'rsatmaydi.
  */
 export const products: Product[] = [
   {
@@ -78,7 +78,6 @@ export const products: Product[] = [
     features: ["vitaminA", "preservativeFree"],
     scenes: ["naked"],
     recommendFor: ["moderate", "attention"],
-    url: "#",
   },
   {
     id: "smile-40-mediclear-dx",
@@ -96,61 +95,6 @@ export const products: Product[] = [
     features: ["vitaminA", "preservativeFree"],
     scenes: ["naked"],
     recommendFor: ["moderate", "attention"],
-    url: "#",
-  },
-  {
-    id: "smile-medical-a",
-    name: "Smile The Medical A",
-    short: {
-      uz: "Shox parda tiklanishiga ko'mak",
-      ru: "Поддержка восстановления роговицы",
-    },
-    description: {
-      uz: "Tarkibidagi A vitamini (retinol) shox parda yuzasining tabiiy tiklanishini qo'llab-quvvatlaydi — ekran oldida uzoq ishlaydiganlar uchun.",
-      ru: "Витамин A (ретинол) в составе поддерживает естественное восстановление поверхности роговицы — для тех, кто подолгу работает за экраном.",
-    },
-    symptoms: ["dry", "tired", "blur"],
-    cooling: 1,
-    features: ["vitaminA"],
-    scenes: ["naked"],
-    recommendFor: ["moderate", "attention"],
-    url: "#",
-  },
-  {
-    id: "smile-40ex",
-    name: "Smile 40 EX",
-    short: {
-      uz: "Charchoq va xiralikka qarshi vitaminli tomchi",
-      ru: "Витаминные капли от усталости и помутнения",
-    },
-    description: {
-      uz: "Vitaminlar va aminokislotalar kompleksi ko'z charchog'ini yengillashtiradi va xiralikni kamaytirishga yordam beradi.",
-      ru: "Комплекс витаминов и аминокислот облегчает усталость глаз и помогает уменьшить помутнение.",
-    },
-    symptoms: ["tired", "blur", "itch"],
-    cooling: 5,
-    features: ["vitaminA"],
-    scenes: ["naked"],
-    recommendFor: ["good", "moderate", "attention"],
-    url: "#",
-  },
-  {
-    id: "smile-contact",
-    name: "Smile Contact EX",
-    short: {
-      uz: "Linza taquvchilar uchun namlovchi tomchi",
-      ru: "Увлажняющие капли для носящих линзы",
-    },
-    description: {
-      uz: "Kontakt linza taqqan holda ham ishlatish mumkin bo'lgan namlovchi tomchi — quruqshash va noqulaylikni yumshatadi.",
-      ru: "Увлажняющие капли, которые можно применять, не снимая контактных линз — смягчают сухость и дискомфорт.",
-    },
-    symptoms: ["contact", "dry"],
-    cooling: 3,
-    features: ["preservativeFree"],
-    scenes: ["naked", "soft", "hard"],
-    recommendFor: ["good", "moderate"],
-    url: "#",
   },
 ];
 

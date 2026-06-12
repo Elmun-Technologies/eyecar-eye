@@ -198,6 +198,8 @@ const uz = {
     fallback1: "Qidiruv shartlarining barchasiga mos tomchi topilmadi, ammo",
     fallbackBlue: "«eng bezovta qilayotgan belgi»",
     fallback2: "ga mos tomchilar quyidagilar:",
+    empty:
+      "Bu shartlarga mos tomchi hozircha katalogda yo'q. Boshqa belgilarni tanlab, qaytadan urinib ko'ring.",
     vitaminBadge: "A vitamini (shox parda tiklovchi komponent) bilan",
     preservativeFree: "Konservantsiz",
     coolingLabel: "Salqinlik",
@@ -425,6 +427,8 @@ const ru: Dict = {
     fallback1: "Капель, подходящих под все условия поиска, не нашлось, но под",
     fallbackBlue: "«самый беспокоящий симптом»",
     fallback2: "подходят следующие:",
+    empty:
+      "Капель, подходящих под эти условия, пока нет в каталоге. Попробуйте выбрать другие симптомы и повторить поиск.",
     vitaminBadge: "С витамином A (компонент для восстановления роговицы)",
     preservativeFree: "Без консервантов",
     coolingLabel: "Прохлада",
