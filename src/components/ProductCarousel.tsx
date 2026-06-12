@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { products } from "@/config/site";
 import { useLang } from "@/lib/i18n";
+import { useProducts } from "@/lib/useProducts";
 import { DropBottleIcon } from "./icons";
 
 function Chevron({ className, flip }: { className?: string; flip?: boolean }) {
@@ -42,6 +42,7 @@ function ExternalIcon({ className }: { className?: string }) {
 /** Mahsulotlar karuseli — surat bosilsa brend sahifasiga olib o'tadi */
 export function ProductCarousel() {
   const { lang, t } = useLang();
+  const products = useProducts();
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
