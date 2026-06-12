@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CameraIcon } from "@/components/icons";
+import { QrCode } from "@/components/QrCode";
 import { useLang } from "@/lib/i18n";
 import {
   analyzeCapture,
+  FacePartialError,
   getFaceLandmarker,
   NoFaceError,
   RESULT_STORAGE_KEY,
@@ -13,18 +15,40 @@ import {
 
 type Phase = "init" | "ready" | "countdown" | "analyzing" | "camera-error";
 
+/** Telefon/planshetmi? Kompyuterda kamera o'rniga QR ko'rsatiladi */
+function isMobileDevice(): boolean {
+  const uaMobile = /Android|iPhone|iPad|iPod|Mobile|webOS/i.test(
+    navigator.userAgent,
+  );
+  const touchSmall =
+    navigator.maxTouchPoints > 1 &&
+    Math.min(screen.width, screen.height) < 820;
+  return uaMobile || touchSmall;
+}
+
 export default function CheckPage() {
   const router = useRouter();
   const { t } = useLang();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [mode, setMode] = useState<"detect" | "qr" | "camera">("detect");
+  const [checkUrl, setCheckUrl] = useState("");
   const [phase, setPhase] = useState<Phase>("init");
   const [count, setCount] = useState(3);
   const [message, setMessage] = useState<string | null>(null);
 
+  // Qurilma turini aniqlash: kompyuterda QR, telefonda to'g'ridan-to'g'ri kamera
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- qurilma faqat klientda ma'lum */
+    setCheckUrl(`${location.origin}/check`);
+    setMode(isMobileDevice() ? "camera" : "qr");
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+
   // Kamerani ishga tushirish + modelni oldindan yuklash
   useEffect(() => {
+    if (mode !== "camera") return;
     let cancelled = false;
     getFaceLandmarker().catch(() => {});
 
@@ -59,7 +83,7 @@ export default function CheckPage() {
       // Sahifadan chiqilganda hisob ham to'xtaydi
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, []);
+  }, [mode]);
 
   const capture = useCallback(async () => {
     const video = videoRef.current;
@@ -84,7 +108,9 @@ export default function CheckPage() {
       streamRef.current?.getTracks().forEach((t) => t.stop());
       router.push("/result");
     } catch (e) {
-      if (e instanceof NoFaceError) {
+      if (e instanceof FacePartialError) {
+        setMessage(t.check.facePartial);
+      } else if (e instanceof NoFaceError) {
         setMessage(t.check.noFace);
       } else {
         setMessage(t.check.analyzeError);
@@ -109,6 +135,45 @@ export default function CheckPage() {
       }
     }, 1000);
   }, [capture]);
+
+  // Kompyuter: kamera o'rniga QR — tekshiruv telefonda davom etadi
+  if (mode !== "camera") {
+    return (
+      <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-10 pt-8">
+        <div className="dot-pattern pointer-events-none absolute inset-0" />
+        {mode === "qr" && (
+          <section className="relative rounded-3xl bg-surface p-6 text-center shadow-sm">
+            <h1 className="text-xl font-extrabold leading-snug">
+              {t.check.qrTitle}
+            </h1>
+            <p className="mt-3 text-[15px] leading-relaxed text-foreground/80">
+              {t.check.qrText}
+            </p>
+            {checkUrl && (
+              <div className="mx-auto mt-5 w-56 rounded-2xl bg-white p-4 shadow-sm">
+                <QrCode value={checkUrl} className="h-auto w-full" />
+              </div>
+            )}
+            <p className="mt-3 break-all text-xs font-bold text-foreground/50">
+              {checkUrl}
+            </p>
+            <button
+              onClick={() => setMode("camera")}
+              className="mt-6 w-full rounded-full border border-muted/60 py-3.5 font-bold text-muted transition hover:bg-black/5"
+            >
+              {t.check.qrContinue}
+            </button>
+            <button
+              onClick={() => router.push("/")}
+              className="mt-3 w-full rounded-full bg-accent-dark py-3.5 font-bold text-white transition hover:bg-accent-dark-hover"
+            >
+              {t.common.cancel}
+            </button>
+          </section>
+        )}
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col pb-6">
