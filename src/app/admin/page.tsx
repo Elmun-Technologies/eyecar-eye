@@ -14,8 +14,10 @@ import type {
   SceneId,
   SymptomId,
 } from "@/config/site";
+import type { Order } from "@/lib/orders";
 
 type View = "loading" | "login" | "panel";
+type Tab = "products" | "orders";
 
 const SYMPTOMS: Array<{ id: SymptomId; label: string }> = [
   { id: "tired", label: "Charchoq" },
@@ -447,8 +449,146 @@ function ProductEditor({
   );
 }
 
+/** Buyurtmalar ro'yxati (admin ichida) */
+function OrdersView() {
+  const [orders, setOrders] = useState<Order[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/orders");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? "Yuklab bo'lmadi");
+      setOrders(data.orders ?? []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Yuklab bo'lmadi");
+      setOrders([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- serverdan bir marta o'qiladi */
+    void load();
+  }, [load]);
+
+  const toggle = async (o: Order) => {
+    const status = o.status === "new" ? "done" : "new";
+    setOrders(
+      (prev) =>
+        prev?.map((x) => (x.id === o.id ? { ...x, status } : x)) ?? prev,
+    );
+    await fetch("/api/admin/orders", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id: o.id, status }),
+    }).catch(() => {});
+  };
+
+  const remove = async (o: Order) => {
+    if (!confirm(`${o.name} (${o.phone}) buyurtmasi o'chirilsinmi?`)) return;
+    setOrders((prev) => prev?.filter((x) => x.id !== o.id) ?? prev);
+    await fetch("/api/admin/orders", {
+      method: "DELETE",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id: o.id }),
+    }).catch(() => {});
+  };
+
+  if (orders === null) {
+    return (
+      <p className="mt-6 text-center font-bold text-foreground/60">
+        Yuklanmoqda…
+      </p>
+    );
+  }
+
+  return (
+    <section className="mt-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-bold text-foreground/60">
+          Jami: {orders.length} ta
+          {orders.some((o) => o.status === "new") &&
+            ` (yangi: ${orders.filter((o) => o.status === "new").length})`}
+        </p>
+        <button
+          onClick={() => {
+            setOrders(null);
+            void load();
+          }}
+          className="rounded-full bg-white px-4 py-1.5 text-sm font-bold shadow-sm"
+        >
+          Yangilash
+        </button>
+      </div>
+
+      {error && <p className="text-sm font-bold text-brand-red">{error}</p>}
+
+      {orders.length === 0 && !error && (
+        <p className="rounded-2xl bg-surface p-5 text-center text-sm font-bold text-foreground/60">
+          Hozircha buyurtmalar yo'q. Mahsulot kartochkasidagi «Buyurtma
+          berish» tugmasi orqali kelgan zayavkalar shu yerda ko'rinadi.
+        </p>
+      )}
+
+      {orders.map((o) => (
+        <article
+          key={o.id}
+          className={`rounded-2xl p-4 shadow-sm ${
+            o.status === "new" ? "bg-[#fff8e6]" : "bg-surface opacity-80"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-extrabold">{o.name}</p>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-[11px] font-extrabold ${
+                o.status === "new"
+                  ? "bg-[#f29422] text-white"
+                  : "bg-foreground/10 text-foreground/60"
+              }`}
+            >
+              {o.status === "new" ? "Yangi" : "Bajarildi"}
+            </span>
+          </div>
+          <a
+            href={`tel:${o.phone}`}
+            className="mt-1 block font-bold text-[#1f6fb5] underline underline-offset-2"
+          >
+            {o.phone}
+          </a>
+          <p className="mt-1 text-sm text-foreground/70">
+            {o.productName} · {o.lang === "ru" ? "Ruscha" : "O'zbekcha"} ·{" "}
+            {new Date(o.createdAt).toLocaleString("uz-UZ", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={() => toggle(o)}
+              className="flex-1 rounded-full bg-white py-2 text-sm font-bold shadow-sm"
+            >
+              {o.status === "new" ? "Bajarildi deb belgilash" : "Yangi qilish"}
+            </button>
+            <button
+              onClick={() => remove(o)}
+              className="rounded-full bg-white px-4 py-2 text-sm font-bold text-brand-red shadow-sm"
+            >
+              O'chirish
+            </button>
+          </div>
+        </article>
+      ))}
+    </section>
+  );
+}
+
 export default function AdminPage() {
   const [view, setView] = useState<View>("loading");
+  const [tab, setTab] = useState<Tab>("products");
   const [password, setPassword] = useState("");
   const [items, setItems] = useState<Product[]>([]);
   const [storage, setStorage] = useState(true);
@@ -598,7 +738,7 @@ export default function AdminPage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col p-5 pb-16">
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold">Mahsulotlar boshqaruvi</h1>
+        <h1 className="text-xl font-extrabold">Boshqaruv paneli</h1>
         <button
           onClick={logout}
           className="rounded-full bg-white px-4 py-2 text-sm font-bold shadow-sm"
@@ -607,7 +747,31 @@ export default function AdminPage() {
         </button>
       </header>
 
-      {!storage && (
+      {/* Bo'limlar */}
+      <div className="mt-4 flex gap-2">
+        {(
+          [
+            ["products", "Mahsulotlar"],
+            ["orders", "Buyurtmalar"],
+          ] as Array<[Tab, string]>
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={`rounded-full px-5 py-2 text-sm font-extrabold transition ${
+              tab === id
+                ? "bg-accent-dark text-white"
+                : "bg-white text-foreground/60 shadow-sm"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "orders" && <OrdersView />}
+
+      {tab === "products" && !storage && (
         <p className="mt-4 rounded-2xl bg-[#fff3d6] p-4 text-sm font-bold leading-relaxed text-[#8a6200]">
           Blob storage hali ulanmagan — o'zgarishlarni saqlab bo'lmaydi.
           Vercel'da loyiha sahifasidan <b>Storage → Create → Blob</b> yarating,
@@ -615,47 +779,51 @@ export default function AdminPage() {
         </p>
       )}
 
-      <section className="mt-5 space-y-3">
-        {items.map((p, i) => (
-          <ProductEditor
-            key={p.id || `new-${i}`}
-            product={p}
-            onChange={(np) =>
-              setItems(items.map((x, xi) => (xi === i ? np : x)))
-            }
-            onDelete={() => setItems(items.filter((_, xi) => xi !== i))}
-            onMove={(dir) => move(i, dir)}
-          />
-        ))}
-      </section>
+      {tab === "products" && (
+        <>
+          <section className="mt-5 space-y-3">
+            {items.map((p, i) => (
+              <ProductEditor
+                key={p.id || `new-${i}`}
+                product={p}
+                onChange={(np) =>
+                  setItems(items.map((x, xi) => (xi === i ? np : x)))
+                }
+                onDelete={() => setItems(items.filter((_, xi) => xi !== i))}
+                onMove={(dir) => move(i, dir)}
+              />
+            ))}
+          </section>
 
-      <button
-        onClick={() => setItems([...items, emptyProduct()])}
-        className="mt-4 w-full rounded-full border-2 border-dashed border-foreground/25 py-3.5 font-bold text-foreground/60 transition hover:border-foreground/40"
-      >
-        + Yangi mahsulot qo'shish
-      </button>
+          <button
+            onClick={() => setItems([...items, emptyProduct()])}
+            className="mt-4 w-full rounded-full border-2 border-dashed border-foreground/25 py-3.5 font-bold text-foreground/60 transition hover:border-foreground/40"
+          >
+            + Yangi mahsulot qo'shish
+          </button>
 
-      {error && (
-        <p className="mt-4 text-sm font-bold text-brand-red">{error}</p>
+          {error && (
+            <p className="mt-4 text-sm font-bold text-brand-red">{error}</p>
+          )}
+          {message && (
+            <p className="mt-4 text-sm font-bold text-brand-green-deep">
+              {message}
+            </p>
+          )}
+
+          <button
+            onClick={save}
+            disabled={busy || !storage || items.length === 0}
+            className="mt-4 w-full rounded-full bg-accent-dark py-4 font-bold text-white transition hover:bg-accent-dark-hover disabled:opacity-50"
+          >
+            {busy ? "Saqlanmoqda…" : "Hammasini saqlash"}
+          </button>
+
+          <p className="mt-3 text-center text-xs text-foreground/50">
+            Mahsulotlar tartibi saytdagi karusel tartibini belgilaydi.
+          </p>
+        </>
       )}
-      {message && (
-        <p className="mt-4 text-sm font-bold text-brand-green-deep">
-          {message}
-        </p>
-      )}
-
-      <button
-        onClick={save}
-        disabled={busy || !storage || items.length === 0}
-        className="mt-4 w-full rounded-full bg-accent-dark py-4 font-bold text-white transition hover:bg-accent-dark-hover disabled:opacity-50"
-      >
-        {busy ? "Saqlanmoqda…" : "Hammasini saqlash"}
-      </button>
-
-      <p className="mt-3 text-center text-xs text-foreground/50">
-        Mahsulotlar tartibi saytdagi karusel tartibini belgilaydi.
-      </p>
     </main>
   );
 }

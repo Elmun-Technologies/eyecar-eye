@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { BrandHeader } from "@/components/BrandHeader";
+import { OrderModal } from "@/components/OrderModal";
 import { DropBottleIcon } from "@/components/icons";
 import { useLang } from "@/lib/i18n";
 import { useProducts } from "@/lib/useProducts";
 import {
   searchProducts,
   type FeatureId,
+  type Product,
   type SceneId,
   type SymptomId,
 } from "@/config/site";
@@ -155,6 +157,7 @@ export default function SearchPage() {
     features: [],
   });
   const [done, setDone] = useState(false);
+  const [ordering, setOrdering] = useState<Product | null>(null);
 
   const step = STEPS[stepIndex];
   const selected = answers[step.id] ?? [];
@@ -279,13 +282,19 @@ export default function SearchPage() {
                     </span>
                   )}
                 </div>
-                {/* Tugma faqat haqiqiy havola bo'lganda chiqadi — soxta «#» yo'q */}
+                <button
+                  onClick={() => setOrdering(p)}
+                  className="mt-4 w-full rounded-full bg-accent-dark py-3.5 text-center font-bold text-white transition hover:bg-accent-dark-hover active:scale-[0.98]"
+                >
+                  {t.order.button}
+                </button>
+                {/* Havola tugmasi faqat haqiqiy URL bo'lganda chiqadi */}
                 {p.url && p.url !== "#" && (
                   <a
                     href={p.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent-dark py-3.5 text-center font-bold text-white transition hover:bg-accent-dark-hover"
+                    className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-full border border-foreground/20 py-3 text-center font-bold text-foreground/70 transition hover:bg-black/5"
                   >
                     {t.search.brandPage}
                     <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5" aria-hidden>
@@ -309,6 +318,10 @@ export default function SearchPage() {
           >
             {t.search.again}
           </button>
+
+          {ordering && (
+            <OrderModal product={ordering} onClose={() => setOrdering(null)} />
+          )}
         </main>
         <BottomNav />
       </>

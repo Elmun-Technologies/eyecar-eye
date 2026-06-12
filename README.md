@@ -34,6 +34,19 @@ Saqlangan o'zgarishlar saytda ~1 daqiqada ko'rinadi (CDN kesh).
 Eslatma: ko'z tahlili avvalgidek 100% brauzerda — serverga faqat mahsulot
 ma'lumotlari boradi, surat emas.
 
+## Buyurtmalar (zayavkalar)
+
+Har bir mahsulot kartochkasida «Buyurtma berish» tugmasi bor: xaridor ism
+va telefon raqamini qoldiradi. Zayavkalar Blob'da saqlanadi
+(`orders/{id}.json` — har biri alohida fayl) va admin panelning
+**Buyurtmalar** bo'limida ko'rinadi: telefonga bosib qo'ng'iroq qilish,
+«Bajarildi» deb belgilash, o'chirish.
+
+Ixtiyoriy: `TELEGRAM_BOT_TOKEN` va `TELEGRAM_CHAT_ID` muhit
+o'zgaruvchilari o'rnatilsa, har yangi buyurtma haqida Telegram'ga xabar
+keladi (BotFather'dan bot oching, botni guruhga qo'shing yoki shaxsiy
+chat ID ni ishlating).
+
 ## Ikki tillilik (uz / ru)
 
 Ilova ikki tilda ishlaydi: birinchi kirishda foydalanuvchidan til so'raladi

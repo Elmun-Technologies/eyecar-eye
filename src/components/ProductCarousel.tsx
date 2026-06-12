@@ -3,7 +3,9 @@
 import { useRef, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { useProducts } from "@/lib/useProducts";
+import { OrderModal } from "./OrderModal";
 import { DropBottleIcon } from "./icons";
+import type { Product } from "@/config/site";
 
 function Chevron({ className, flip }: { className?: string; flip?: boolean }) {
   return (
@@ -45,6 +47,7 @@ export function ProductCarousel() {
   const products = useProducts();
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const [ordering, setOrdering] = useState<Product | null>(null);
 
   const onScroll = () => {
     const el = trackRef.current;
@@ -110,6 +113,12 @@ export function ProductCarousel() {
               ) : (
                 <div className="rounded-2xl bg-white p-4 shadow-sm">{card}</div>
               )}
+              <button
+                onClick={() => setOrdering(p)}
+                className="mt-3 w-full rounded-full bg-accent-dark py-3.5 font-bold text-white transition hover:bg-accent-dark-hover active:scale-[0.98]"
+              >
+                {t.order.button}
+              </button>
             </div>
           );
         })}
@@ -147,6 +156,10 @@ export function ProductCarousel() {
           />
         ))}
       </div>
+
+      {ordering && (
+        <OrderModal product={ordering} onClose={() => setOrdering(null)} />
+      )}
     </div>
   );
 }
