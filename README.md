@@ -10,6 +10,15 @@ tavsiya va «Smile» ko'z tomchilari taklif qilinadi.
 > bosmaydi. Ilova ichidagi ogohlantirishlar shu sababli majburiy qism
 > hisoblanadi.
 
+## Ikki tillilik (uz / ru)
+
+Ilova ikki tilda ishlaydi: birinchi kirishda foydalanuvchidan til so'raladi
+(O'zbekcha / Русский), tanlov `localStorage` da saqlanadi va bosh sahifadagi
+UZ/RU tugmalari orqali keyin ham almashtiriladi. Barcha matnlar
+`src/lib/i18n.tsx` dagi lug'atlarda — sahifalarga matn yozilmaydi.
+Mahsulot tavsiflari `site.ts` da har ikkala tilda. Sahifalarda
+«Powered by Dr Schats» belgisi ko'rsatiladi.
+
 ## Oqim
 
 1. **Bosh sahifa** — ikkita asosiy tugma: «Ko'zni AI tekshiruvi» va «Ko'z tomchilari»
@@ -129,9 +138,10 @@ src/
     products/page.tsx # ko'z tomchilari karuseli
     search/page.tsx   # tomchi qidiruvi (5 bosqichli so'rovnoma)
     terms/page.tsx    # foydalanish shartlari
-  components/         # modal oqimi, nav, karusel, ikonkalar, illyustratsiyalar
-  config/site.ts      # brend, mahsulotlar va qidiruv mantiqlari
+  components/         # modal oqimi, nav, karusel, til darvozasi, illyustratsiyalar
+  config/site.ts      # brend, mahsulotlar (uz/ru) va qidiruv mantiqlari
   lib/analysis.ts     # MediaPipe + ko'z tahlili
+  lib/i18n.tsx        # uz/ru lug'atlari, LanguageProvider, til darvozasi
 scripts/
   setup-assets.mjs    # postinstall: wasm + model tayyorlash
 ```

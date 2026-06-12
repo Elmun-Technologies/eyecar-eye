@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { BrandHeader } from "@/components/BrandHeader";
 import { DropBottleIcon } from "@/components/icons";
+import { useLang } from "@/lib/i18n";
 import {
   searchProducts,
   type FeatureId,
@@ -11,72 +12,36 @@ import {
   type SymptomId,
 } from "@/config/site";
 
-const SYMPTOM_OPTIONS = [
-  { id: "tired", label: "Ko'z charchog'i" },
-  { id: "dry", label: "Quruq ko'z (ko'z qurishi)" },
-  { id: "blur", label: "Ko'z xiralashishi (yiring va h.k. sabab)" },
-  { id: "itch", label: "Ko'z qichishishi" },
-  { id: "red", label: "Ko'z qizarishi" },
-  { id: "contact", label: "Linza taqqandagi noqulaylik" },
+const SYMPTOM_IDS: SymptomId[] = [
+  "tired",
+  "dry",
+  "blur",
+  "itch",
+  "red",
+  "contact",
 ];
 
+type StepId = "symptoms" | "primary" | "cooling" | "scene" | "features";
+
 type Step = {
-  id: "symptoms" | "primary" | "cooling" | "scene" | "features";
-  title: string;
-  note?: string;
+  id: StepId;
   multi: boolean;
   /** Tanlovsiz davom etish mumkinmi */
   optional?: boolean;
-  options: Array<{ id: string; label: string }>;
+  optionIds: string[];
 };
 
-/** Originaldagi 5 bosqich */
+/** Originaldagi 5 bosqich (matnlar lug'atdan olinadi) */
 const STEPS: Step[] = [
-  {
-    id: "symptoms",
-    title: "Bezovta qilayotgan belgilarni tanlang",
-    note: "(bir nechtasini tanlash mumkin)",
-    multi: true,
-    options: SYMPTOM_OPTIONS,
-  },
-  {
-    id: "primary",
-    title: "Eng bezovta qilayotgan belgini tanlang",
-    multi: false,
-    options: SYMPTOM_OPTIONS,
-  },
-  {
-    id: "cooling",
-    title: "Tomizish hissi (salqinlik)ni tanlang",
-    multi: false,
-    options: [
-      { id: "any", label: "Farqi yo'q" },
-      { id: "none", label: "Salqinliksiz" },
-      { id: "mild", label: "Yengil salqinlik" },
-      { id: "strong", label: "Kuchli salqinlik" },
-    ],
-  },
-  {
-    id: "scene",
-    title: "Foydalanish holatini tanlang",
-    multi: false,
-    options: [
-      { id: "any", label: "Farqi yo'q" },
-      { id: "naked", label: "Linzasiz (oddiy ko'zga)" },
-      { id: "soft", label: "Yumshoq kontakt linza taqqanda" },
-      { id: "hard", label: "Qattiq kontakt linza taqqanda" },
-    ],
-  },
+  { id: "symptoms", multi: true, optionIds: SYMPTOM_IDS },
+  { id: "primary", multi: false, optionIds: SYMPTOM_IDS },
+  { id: "cooling", multi: false, optionIds: ["any", "none", "mild", "strong"] },
+  { id: "scene", multi: false, optionIds: ["any", "naked", "soft", "hard"] },
   {
     id: "features",
-    title: "Mahsulot xususiyatlarini tanlang",
-    note: "(bir nechtasini tanlash mumkin)",
     multi: true,
     optional: true,
-    options: [
-      { id: "vitaminA", label: "A vitamini (shox parda tiklovchi komponent) bilan" },
-      { id: "preservativeFree", label: "Konservantsiz" },
-    ],
+    optionIds: ["vitaminA", "preservativeFree"],
   },
 ];
 
@@ -119,10 +84,10 @@ function CheckSquare({
 }
 
 /** Salqinlik darajasi — originaldagidek 7 yulduzli shkala */
-function CoolingStars({ value }: { value: number }) {
+function CoolingStars({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-extrabold text-[#1f6fb5]">Salqinlik</span>
+      <span className="text-sm font-extrabold text-[#1f6fb5]">{label}</span>
       <span className="flex gap-0.5">
         {Array.from({ length: 7 }).map((_, i) => (
           <svg key={i} viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
@@ -140,16 +105,8 @@ function CoolingStars({ value }: { value: number }) {
   );
 }
 
-function SearchHeader() {
-  return (
-    <header className="relative flex flex-col items-center gap-1.5 pt-2 text-center">
-      <DropBottleIcon className="h-12 w-12 text-foreground" />
-      <h1 className="text-xl font-extrabold">Ko'z tomchisi qidiruvi</h1>
-    </header>
-  );
-}
-
 export default function SearchPage() {
+  const { lang, t } = useLang();
   const [stepIndex, setStepIndex] = useState(0);
   // Salqinlik va holat bosqichlarida originaldagidek «Farqi yo'q» oldindan tanlangan
   const [answers, setAnswers] = useState<Record<string, string[]>>({
@@ -161,6 +118,32 @@ export default function SearchPage() {
 
   const step = STEPS[stepIndex];
   const selected = answers[step.id] ?? [];
+
+  const stepTitle: Record<StepId, string> = {
+    symptoms: t.search.stepSymptoms,
+    primary: t.search.stepPrimary,
+    cooling: t.search.stepCooling,
+    scene: t.search.stepScene,
+    features: t.search.stepFeatures,
+  };
+
+  const optionLabel = (stepId: StepId, optionId: string): string => {
+    switch (stepId) {
+      case "symptoms":
+      case "primary":
+        return t.search.symptoms[optionId as SymptomId];
+      case "cooling":
+        return t.search.coolingOpts[
+          optionId as keyof typeof t.search.coolingOpts
+        ];
+      case "scene":
+        return t.search.sceneOpts[optionId as keyof typeof t.search.sceneOpts];
+      case "features":
+        return t.search.featureOpts[
+          optionId as keyof typeof t.search.featureOpts
+        ];
+    }
+  };
 
   const toggle = (optionId: string) => {
     setAnswers((prev) => {
@@ -203,23 +186,22 @@ export default function SearchPage() {
         <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-4 pb-32 pt-5">
           <div className="dot-pattern pointer-events-none absolute inset-0" />
           <BrandHeader />
-          <div className="relative">
-            <SearchHeader />
-          </div>
+          <header className="relative flex flex-col items-center gap-1.5 pt-4 text-center">
+            <DropBottleIcon className="h-12 w-12 text-foreground" />
+            <h1 className="text-xl font-extrabold">{t.search.title}</h1>
+          </header>
 
           <p className="relative mt-5 text-center text-[17px] font-extrabold leading-relaxed">
             {exact ? (
               <>
-                Shartlaringizga mos ko'z tomchilari{" "}
-                <span className="text-[#3f8fdc]">topildi:</span>
+                {t.search.exact1}{" "}
+                <span className="text-[#3f8fdc]">{t.search.exactBlue}</span>
               </>
             ) : (
               <>
-                Qidiruv shartlarining barchasiga mos tomchi topilmadi, ammo{" "}
-                <span className="text-[#3f8fdc]">
-                  «eng bezovta qilayotgan belgi»
-                </span>
-                ga mos tomchilar quyidagilar:
+                {t.search.fallback1}{" "}
+                <span className="text-[#3f8fdc]">{t.search.fallbackBlue}</span>
+                {t.search.fallback2}
               </>
             )}
           </p>
@@ -247,22 +229,22 @@ export default function SearchPage() {
                   <div className="min-w-0 flex-1">
                     {p.features.includes("vitaminA") && (
                       <p className="rounded-xl bg-[#f29422] px-3 py-2 text-center text-xs font-extrabold leading-snug text-white">
-                        A vitamini (shox parda tiklovchi komponent) bilan
+                        {t.search.vitaminBadge}
                       </p>
                     )}
                     <p className="mt-2 text-sm font-bold leading-snug">
-                      {p.short}
+                      {p.short[lang]}
                     </p>
                   </div>
                 </div>
                 <p className="mt-3 text-[15px] leading-relaxed">
-                  {p.description}
+                  {p.description[lang]}
                 </p>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                  <CoolingStars value={p.cooling} />
+                  <CoolingStars value={p.cooling} label={t.search.coolingLabel} />
                   {p.features.includes("preservativeFree") && (
                     <span className="rounded-full border border-foreground/25 px-3 py-1 text-xs font-bold text-foreground/70">
-                      Konservantsiz
+                      {t.search.preservativeFree}
                     </span>
                   )}
                 </div>
@@ -273,7 +255,7 @@ export default function SearchPage() {
                     rel="noreferrer"
                     className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent-dark py-3.5 text-center font-bold text-white transition hover:bg-accent-dark-hover"
                   >
-                    Mahsulot brend sahifasi
+                    {t.search.brandPage}
                     <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5" aria-hidden>
                       <path
                         d="M9 5H5v14h14v-4M14 4h6v6M20 4 11 13"
@@ -293,7 +275,7 @@ export default function SearchPage() {
             onClick={restart}
             className="relative mt-6 w-full rounded-full border border-muted/60 py-3.5 font-bold text-muted transition hover:bg-black/5"
           >
-            Qaytadan qidirish
+            {t.search.again}
           </button>
         </main>
         <BottomNav />
@@ -306,33 +288,36 @@ export default function SearchPage() {
       <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-32 pt-5">
         <div className="dot-pattern pointer-events-none absolute inset-0" />
         <BrandHeader />
-        <div className="relative">
-          <SearchHeader />
-        </div>
+        <header className="relative flex flex-col items-center gap-1.5 pt-4 text-center">
+          <DropBottleIcon className="h-12 w-12 text-foreground" />
+          <h1 className="text-xl font-extrabold">{t.search.title}</h1>
+        </header>
 
         <div className="relative mt-6 flex items-start gap-2.5">
           <CheckSquare checked className="mt-0.5 h-7 w-7 shrink-0" />
           <p className="font-extrabold leading-snug">
-            {step.title}{" "}
-            {step.note && (
-              <span className="font-bold text-[#3f8fdc]">{step.note}</span>
+            {stepTitle[step.id]}{" "}
+            {step.multi && (
+              <span className="font-bold text-[#3f8fdc]">
+                {t.search.multiNote}
+              </span>
             )}
           </p>
         </div>
 
         <div className="relative mt-4 space-y-3.5">
-          {step.options.map((o) => {
-            const checked = selected.includes(o.id);
+          {step.optionIds.map((id) => {
+            const checked = selected.includes(id);
             return (
               <button
-                key={o.id}
-                onClick={() => toggle(o.id)}
+                key={id}
+                onClick={() => toggle(id)}
                 className={`flex w-full items-center gap-3 rounded-full px-4 py-4 text-left text-[15px] font-bold shadow-sm transition active:scale-[0.98] ${
                   checked ? "bg-[#dcd6f2]" : "bg-white"
                 }`}
               >
                 <CheckSquare checked={checked} className="h-6 w-6 shrink-0" />
-                {o.label}
+                {optionLabel(step.id, id)}
               </button>
             );
           })}
@@ -344,7 +329,7 @@ export default function SearchPage() {
               onClick={() => setStepIndex(stepIndex - 1)}
               className="shrink-0 rounded-full bg-[#ececf2] px-7 py-3.5 font-bold shadow-sm transition hover:bg-[#e2e2ea]"
             >
-              Orqaga
+              {t.common.back}
             </button>
           )}
           <button
@@ -354,10 +339,10 @@ export default function SearchPage() {
           >
             {stepIndex < STEPS.length - 1 ? (
               <>
-                Keyingisi&ensp;{stepIndex + 1} / {STEPS.length}
+                {t.common.next}&ensp;{stepIndex + 1} / {STEPS.length}
               </>
             ) : (
-              "Natijani ko'rish"
+              t.search.seeResults
             )}
           </button>
         </div>

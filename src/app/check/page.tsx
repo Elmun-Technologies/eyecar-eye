@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CameraIcon } from "@/components/icons";
+import { useLang } from "@/lib/i18n";
 import {
   analyzeCapture,
   getFaceLandmarker,
@@ -14,6 +15,7 @@ type Phase = "init" | "ready" | "countdown" | "analyzing" | "camera-error";
 
 export default function CheckPage() {
   const router = useRouter();
+  const { t } = useLang();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [phase, setPhase] = useState<Phase>("init");
@@ -60,7 +62,7 @@ export default function CheckPage() {
     const video = videoRef.current;
     if (!video || video.videoWidth === 0) {
       setPhase("ready");
-      setMessage("Kamera tayyor emas, qayta urinib ko'ring.");
+      setMessage(t.check.notReady);
       return;
     }
     setPhase("analyzing");
@@ -80,17 +82,13 @@ export default function CheckPage() {
       router.push("/result");
     } catch (e) {
       if (e instanceof NoFaceError) {
-        setMessage(
-          "Yuz aniqlanmadi. Yorug'roq joyda, yuzingizni ramka ichiga to'liq joylashtirib qayta urining.",
-        );
+        setMessage(t.check.noFace);
       } else {
-        setMessage(
-          "Tahlil vaqtida xatolik yuz berdi. Qayta urinib ko'ring.",
-        );
+        setMessage(t.check.analyzeError);
       }
       setPhase("ready");
     }
-  }, [router]);
+  }, [router, t]);
 
   const startCountdown = useCallback(() => {
     setPhase("countdown");
@@ -114,16 +112,13 @@ export default function CheckPage() {
       <div className="relative flex-1 overflow-hidden bg-black">
         {phase === "camera-error" ? (
           <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-4 p-6 text-center text-white">
-            <p className="font-bold">Kameraga ruxsat berilmadi</p>
-            <p className="text-sm text-white/70">
-              Tekshiruv uchun brauzer sozlamalaridan kameraga ruxsat bering va
-              sahifani yangilang.
-            </p>
+            <p className="font-bold">{t.check.camDenied}</p>
+            <p className="text-sm text-white/70">{t.check.camDeniedHint}</p>
             <button
               onClick={() => location.reload()}
               className="rounded-full bg-white px-6 py-2.5 font-bold text-foreground"
             >
-              Qayta urinish
+              {t.check.retry}
             </button>
           </div>
         ) : (
@@ -159,7 +154,7 @@ export default function CheckPage() {
               <button
                 onClick={startCountdown}
                 disabled={phase !== "ready"}
-                aria-label="Suratga olish"
+                aria-label={t.check.capture}
                 className="animate-pulse-ring absolute left-1/2 top-[10%] flex h-16 w-16 -translate-x-1/2 items-center justify-center rounded-full border-4 border-brand-green bg-white shadow-lg transition active:scale-95 disabled:opacity-60"
               >
                 <CameraIcon className="h-8 w-8 text-foreground" />
@@ -182,13 +177,13 @@ export default function CheckPage() {
             {phase === "analyzing" && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/55">
                 <span className="h-12 w-12 animate-spin rounded-full border-4 border-white/30 border-t-white" />
-                <p className="font-bold text-white">AI tahlil qilmoqda…</p>
+                <p className="font-bold text-white">{t.check.analyzing}</p>
               </div>
             )}
 
             {phase === "init" && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/55">
-                <p className="font-bold text-white">Kamera yoqilmoqda…</p>
+                <p className="font-bold text-white">{t.check.starting}</p>
               </div>
             )}
 
@@ -204,8 +199,7 @@ export default function CheckPage() {
                     <span className="mr-1 inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-brand-green bg-white align-middle">
                       <CameraIcon className="h-3.5 w-3.5 text-foreground" />
                     </span>
-                    tugmasiga qarab, ko'zingizni katta oching va tugmani
-                    bosing.
+                    {t.check.hintPost}
                   </p>
                 )}
               </div>
@@ -218,7 +212,7 @@ export default function CheckPage() {
         onClick={() => router.push("/")}
         className="mx-5 mt-4 rounded-full border border-muted/60 py-3.5 font-bold text-muted transition hover:bg-black/5"
       >
-        Bekor qilish
+        {t.common.cancel}
       </button>
     </main>
   );

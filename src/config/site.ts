@@ -28,14 +28,17 @@ export type SymptomId =
 /** Foydalanish holati: linzasiz / yumshoq / qattiq linza bilan */
 export type SceneId = "naked" | "soft" | "hard";
 
+/** Ikki tilli matn (uz/ru) */
+export type Localized = { uz: string; ru: string };
+
 /** Mahsulot xususiyatlari (qidiruv filtri) */
 export type FeatureId = "vitaminA" | "preservativeFree";
 
 export type Product = {
   id: string;
   name: string;
-  short: string;
-  description: string;
+  short: Localized;
+  description: Localized;
   /** Qaysi belgilarda tavsiya qilinadi (tomchi qidiruvi mosligi) */
   symptoms: SymptomId[];
   /** Salqinlik darajasi, 0–7 (originaldagi 清涼感 yulduzlari) */
@@ -62,9 +65,14 @@ export const products: Product[] = [
   {
     id: "smile-40-premium-the-one-mild",
     name: "Smile 40 Premium THE ONE Mild",
-    short: "Bitta tomchi — barcha asosiy belgilarga qarshi",
-    description:
-      "Ko'z charchog'i, xiralik, qizarish va qichishishning umumiy sababi bo'lgan shox parda shikastini tiklashga qaratilgan keng tarkibli tomchi.",
+    short: {
+      uz: "Bitta tomchi — barcha asosiy belgilarga qarshi",
+      ru: "Одни капли — против всех основных симптомов",
+    },
+    description: {
+      uz: "Ko'z charchog'i, xiralik, qizarish va qichishishning umumiy sababi bo'lgan shox parda shikastini tiklashga qaratilgan keng tarkibli tomchi.",
+      ru: "Капли широкого состава, направленные на восстановление повреждения роговицы — общей причины усталости глаз, помутнения, покраснения и зуда.",
+    },
     symptoms: ["tired", "blur", "red", "itch"],
     cooling: 2,
     features: ["vitaminA", "preservativeFree"],
@@ -75,9 +83,14 @@ export const products: Product[] = [
   {
     id: "smile-40-mediclear-dx",
     name: "Smile 40 MediClear DX",
-    short: "Qichishish va qizarishga qarshi",
-    description:
-      "Qichishish, qizarish va ko'z yiringi bezovta qilganda — B6, A va E vitaminlari hamda tabiiy yallig'lanishga qarshi komponent bilan. Konservantsiz.",
+    short: {
+      uz: "Qichishish va qizarishga qarshi",
+      ru: "Против зуда и покраснения",
+    },
+    description: {
+      uz: "Qichishish, qizarish va ko'z yiringi bezovta qilganda — B6, A va E vitaminlari hamda tabiiy yallig'lanishga qarshi komponent bilan. Konservantsiz.",
+      ru: "Когда беспокоят зуд, покраснение и выделения — с витаминами B6, A и E и природным противовоспалительным компонентом. Без консервантов.",
+    },
     symptoms: ["itch", "red", "blur"],
     cooling: 4,
     features: ["vitaminA", "preservativeFree"],
@@ -88,9 +101,14 @@ export const products: Product[] = [
   {
     id: "smile-medical-a",
     name: "Smile The Medical A",
-    short: "Shox parda tiklanishiga ko'mak",
-    description:
-      "Tarkibidagi A vitamini (retinol) shox parda yuzasining tabiiy tiklanishini qo'llab-quvvatlaydi — ekran oldida uzoq ishlaydiganlar uchun.",
+    short: {
+      uz: "Shox parda tiklanishiga ko'mak",
+      ru: "Поддержка восстановления роговицы",
+    },
+    description: {
+      uz: "Tarkibidagi A vitamini (retinol) shox parda yuzasining tabiiy tiklanishini qo'llab-quvvatlaydi — ekran oldida uzoq ishlaydiganlar uchun.",
+      ru: "Витамин A (ретинол) в составе поддерживает естественное восстановление поверхности роговицы — для тех, кто подолгу работает за экраном.",
+    },
     symptoms: ["dry", "tired", "blur"],
     cooling: 1,
     features: ["vitaminA"],
@@ -101,9 +119,14 @@ export const products: Product[] = [
   {
     id: "smile-40ex",
     name: "Smile 40 EX",
-    short: "Charchoq va xiralikka qarshi vitaminli tomchi",
-    description:
-      "Vitaminlar va aminokislotalar kompleksi ko'z charchog'ini yengillashtiradi va xiralikni kamaytirishga yordam beradi.",
+    short: {
+      uz: "Charchoq va xiralikka qarshi vitaminli tomchi",
+      ru: "Витаминные капли от усталости и помутнения",
+    },
+    description: {
+      uz: "Vitaminlar va aminokislotalar kompleksi ko'z charchog'ini yengillashtiradi va xiralikni kamaytirishga yordam beradi.",
+      ru: "Комплекс витаминов и аминокислот облегчает усталость глаз и помогает уменьшить помутнение.",
+    },
     symptoms: ["tired", "blur", "itch"],
     cooling: 5,
     features: ["vitaminA"],
@@ -114,9 +137,14 @@ export const products: Product[] = [
   {
     id: "smile-contact",
     name: "Smile Contact EX",
-    short: "Linza taquvchilar uchun namlovchi tomchi",
-    description:
-      "Kontakt linza taqqan holda ham ishlatish mumkin bo'lgan namlovchi tomchi — quruqshash va noqulaylikni yumshatadi.",
+    short: {
+      uz: "Linza taquvchilar uchun namlovchi tomchi",
+      ru: "Увлажняющие капли для носящих линзы",
+    },
+    description: {
+      uz: "Kontakt linza taqqan holda ham ishlatish mumkin bo'lgan namlovchi tomchi — quruqshash va noqulaylikni yumshatadi.",
+      ru: "Увлажняющие капли, которые можно применять, не снимая контактных линз — смягчают сухость и дискомфорт.",
+    },
     symptoms: ["contact", "dry"],
     cooling: 3,
     features: ["preservativeFree"],

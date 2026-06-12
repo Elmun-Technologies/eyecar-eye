@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { products } from "@/config/site";
+import { useLang } from "@/lib/i18n";
 import { DropBottleIcon } from "./icons";
 
 function Chevron({ className, flip }: { className?: string; flip?: boolean }) {
@@ -40,6 +41,7 @@ function ExternalIcon({ className }: { className?: string }) {
 
 /** Mahsulotlar karuseli — surat bosilsa brend sahifasiga olib o'tadi */
 export function ProductCarousel() {
+  const { lang, t } = useLang();
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -86,13 +88,13 @@ export function ProductCarousel() {
                       {p.name}
                     </p>
                     <p className="text-center text-xs font-bold text-foreground/55">
-                      {p.short}
+                      {p.short[lang]}
                     </p>
                   </>
                 )}
               </div>
               <p className="mt-3 flex items-center justify-center gap-2 text-center text-sm font-bold">
-                Tomchi rasmini bosib brend sahifasiga o'ting
+                {t.products.tap}
                 <ExternalIcon className="h-5 w-5 shrink-0" />
               </p>
             </a>
@@ -103,7 +105,7 @@ export function ProductCarousel() {
       {active > 0 && (
         <button
           onClick={() => go(active - 1)}
-          aria-label="Oldingi mahsulot"
+          aria-label={t.products.ariaPrev}
           className="absolute -left-2 top-[38%] z-10 text-[#e0559a]"
         >
           <Chevron className="h-9 w-9" flip />
@@ -112,7 +114,7 @@ export function ProductCarousel() {
       {active < products.length - 1 && (
         <button
           onClick={() => go(active + 1)}
-          aria-label="Keyingi mahsulot"
+          aria-label={t.products.ariaNext}
           className="absolute -right-2 top-[38%] z-10 text-[#e0559a]"
         >
           <Chevron className="h-9 w-9" />
@@ -125,7 +127,7 @@ export function ProductCarousel() {
           <button
             key={p.id}
             onClick={() => go(i)}
-            aria-label={`${i + 1}-mahsulot`}
+            aria-label={t.products.ariaDot(i + 1)}
             className={`h-2.5 w-2.5 rounded-full transition ${
               i === active ? "bg-[#e0559a]" : "bg-foreground/20"
             }`}

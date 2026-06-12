@@ -10,7 +10,7 @@ Smile — Shox parda tekshiruvi: a mobile-first, Uzbek-language web app that "ch
 
 The UI is being matched to screenshots of the original Japanese app (eyecare-app.lion-apps.jp) supplied by the owner; visual details (green oval camera frame, score bars, star rating, "scroll ♡" hint, squircle bottom nav) intentionally mirror it. Original photos/text are not copied — illustrations are stylized SVGs and all copy is original Uzbek.
 
-All UI copy, error messages, and code comments are in Uzbek (`<html lang="uz">`).
+The UI is bilingual (Uzbek/Russian): all copy lives in the dictionaries in `src/lib/i18n.tsx` (`LanguageProvider` + `useLang()`); never hardcode UI strings in pages/components. The chosen language is stored in `localStorage` (`smile-lang`); on first visit `LanguageGate` blocks the app until a language is picked. SSR prerenders Uzbek (`<html lang="uz">`, updated client-side). Product copy (`short`/`description`) is localized per-product in `site.ts` via the `Localized` type. Code comments are in Uzbek. A "Powered by Dr Schats" mark (`PoweredBy`) appears on the home, terms, result pages and the language gate — keep it.
 
 ## Commands
 

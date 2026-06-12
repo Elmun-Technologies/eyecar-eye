@@ -1,19 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { BrandHeader } from "@/components/BrandHeader";
 import { BottomNav } from "@/components/BottomNav";
-import { site } from "@/config/site";
-
-export const metadata = {
-  title: `Shox parda haqida — ${site.brand}`,
-};
-
-const SYMPTOMS = [
-  "Kuniga 5 soatdan ko'proq TV, smartfon yoki kompyuter ekraniga qaraysiz",
-  "Kun davomida ko'zga qum tushgandek g'ijirlab turadi",
-  "Ko'zni 10 soniyadan ortiq ochiq tutib turolmaysiz",
-  "Ko'z vaqti-vaqti bilan og'rib turadi",
-  "Ko'z doim qurib, xira va charchagan his etiladi",
-];
+import { useLang } from "@/lib/i18n";
 
 function CheckBadge({ className }: { className?: string }) {
   return (
@@ -40,7 +30,7 @@ function CheckBadge({ className }: { className?: string }) {
 }
 
 /** Oddiy holatdagi ko'z — stilizatsiya qilingan illyustratsiya */
-function NormalEye({ className }: { className?: string }) {
+function NormalEye({ className, label }: { className?: string; label: string }) {
   return (
     <svg viewBox="0 0 280 160" className={className} aria-hidden>
       <rect width="280" height="160" rx="12" fill="#caa37e" />
@@ -73,14 +63,24 @@ function NormalEye({ className }: { className?: string }) {
         fontWeight="700"
         fill="#fff"
       >
-        Oddiy holatdagi ko'z
+        {label}
       </text>
     </svg>
   );
 }
 
 /** Maxsus usulda ko'rsatilgan shikastlanish — stilizatsiya */
-function DamagedEye({ className }: { className?: string }) {
+function DamagedEye({
+  className,
+  line1,
+  line2,
+  arrowWord,
+}: {
+  className?: string;
+  line1: string;
+  line2: string;
+  arrowWord: string;
+}) {
   return (
     <svg viewBox="0 0 280 160" className={className} aria-hidden>
       <rect width="280" height="160" rx="12" fill="#1450b8" />
@@ -128,22 +128,30 @@ function DamagedEye({ className }: { className?: string }) {
           <path d="M0 0l10 5-10 5z" fill="#fff" />
         </marker>
       </defs>
-      <text x="232" y="56" fontSize="13" fontWeight="700" fill="#fff" textAnchor="middle">
-        shikast
+      <text x="226" y="56" fontSize="12" fontWeight="700" fill="#fff" textAnchor="middle">
+        {arrowWord}
       </text>
-      <rect x="0" y="0" width="170" height="44" rx="12" fill="#00000055" />
-      <text x="12" y="19" fontSize="12.5" fontWeight="700" fill="#fff">
-        Maxsus usul bilan shox parda
+      <rect x="0" y="0" width="190" height="44" rx="12" fill="#00000055" />
+      <text x="12" y="19" fontSize="12" fontWeight="700" fill="#fff">
+        {line1}
       </text>
-      <text x="12" y="36" fontSize="12.5" fontWeight="700" fill="#fff">
-        shikasti ko'rsatilgan
+      <text x="12" y="36" fontSize="12" fontWeight="700" fill="#fff">
+        {line2}
       </text>
     </svg>
   );
 }
 
 /** Hujayrali to'qima fonidagi yoriq — tiklanish sustligi haqida */
-function CorneaCrack({ className }: { className?: string }) {
+function CorneaCrack({
+  className,
+  cap1,
+  cap2,
+}: {
+  className?: string;
+  cap1: string;
+  cap2: string;
+}) {
   return (
     <svg viewBox="0 0 280 150" className={className} aria-hidden>
       <defs>
@@ -167,19 +175,25 @@ function CorneaCrack({ className }: { className?: string }) {
         fill="none"
         opacity="0.7"
       />
-      <rect x="10" y="108" width="216" height="34" rx="10" fill="#ffffffd9" />
+      <rect x="10" y="108" width="248" height="34" rx="10" fill="#ffffffd9" />
       <text x="18" y="122" fontSize="11" fontWeight="700" fill="#4a3522">
-        Tiklanish quvvati pasaysa, ko'z
+        {cap1}
       </text>
       <text x="18" y="136" fontSize="11" fontWeight="700" fill="#4a3522">
-        o'z holiga qaytishi qiyinlashadi
+        {cap2}
       </text>
     </svg>
   );
 }
 
 /** Shikast fonida kuchayadigan belgilar so'zlari */
-function SymptomWords({ className }: { className?: string }) {
+function SymptomWords({
+  className,
+  words,
+}: {
+  className?: string;
+  words: [string, string, string, string];
+}) {
   return (
     <svg viewBox="0 0 280 150" className={className} aria-hidden>
       <defs>
@@ -204,24 +218,32 @@ function SymptomWords({ className }: { className?: string }) {
         strokeLinecap="round"
         opacity="0.7"
       />
-      <text x="22" y="48" fontSize="24" fontWeight="800" fill="#6e4a2a">
-        Charchoq
+      <text x="22" y="48" fontSize="22" fontWeight="800" fill="#6e4a2a">
+        {words[0]}
       </text>
-      <text x="172" y="86" fontSize="22" fontWeight="800" fill="#8f7bc7">
-        Xiralik
+      <text x="160" y="86" fontSize="21" fontWeight="800" fill="#8f7bc7">
+        {words[1]}
       </text>
-      <text x="22" y="92" fontSize="22" fontWeight="800" fill="#b0556b">
-        Qizarish
+      <text x="22" y="92" fontSize="21" fontWeight="800" fill="#b0556b">
+        {words[2]}
       </text>
-      <text x="120" y="132" fontSize="22" fontWeight="800" fill="#7a68bd">
-        Qichishish
+      <text x="120" y="132" fontSize="21" fontWeight="800" fill="#7a68bd">
+        {words[3]}
       </text>
     </svg>
   );
 }
 
 /** A vitamini tomchisi shikastlangan yuzaga tushmoqda */
-function VitaminDrop({ className }: { className?: string }) {
+function VitaminDrop({
+  className,
+  dropLine,
+  note,
+}: {
+  className?: string;
+  dropLine: string;
+  note: string;
+}) {
   return (
     <svg viewBox="0 0 280 160" className={className} aria-hidden>
       <defs>
@@ -269,17 +291,29 @@ function VitaminDrop({ className }: { className?: string }) {
         fontWeight="700"
         fill="#a33a52"
       >
-        vitamini
+        {dropLine}
       </text>
       <text x="12" y="20" fontSize="10" fontWeight="700" fill="#6b5a44">
-        ※ tasviriy chizma
+        {note}
       </text>
     </svg>
   );
 }
 
 /** Gialuron kislota ishlab chiqarilishi — hujayralar qatori */
-function HyaluronCells({ className }: { className?: string }) {
+function HyaluronCells({
+  className,
+  line1,
+  line2,
+  legend,
+  note,
+}: {
+  className?: string;
+  line1: string;
+  line2: string;
+  legend: string;
+  note: string;
+}) {
   const cells = [
     [34, 118], [86, 124], [140, 120], [194, 126], [246, 118],
   ] as const;
@@ -306,7 +340,7 @@ function HyaluronCells({ className }: { className?: string }) {
         fontWeight="800"
         fill="#1f4f8f"
       >
-        Shox parda epiteliy hujayralari tiklanishini
+        {line1}
       </text>
       <text
         x="140"
@@ -316,7 +350,7 @@ function HyaluronCells({ className }: { className?: string }) {
         fontWeight="800"
         fill="#1f4f8f"
       >
-        rag'batlantiruvchi «gialuron kislota» ishlab chiqariladi
+        {line2}
       </text>
       {cells.map(([x, y], i) => (
         <g key={i}>
@@ -341,17 +375,18 @@ function HyaluronCells({ className }: { className?: string }) {
         </g>
       ))}
       <text x="12" y="162" fontSize="10" fontWeight="700" fill="#6b5a44">
-        ※ tasviriy chizma
+        {note}
       </text>
-      <circle cx="216" cy="160" r="4" fill="#3f8fdc" />
-      <text x="224" y="164" fontSize="10" fontWeight="700" fill="#1f4f8f">
-        — gialuron kislota
+      <circle cx="152" cy="159" r="4" fill="#3f8fdc" />
+      <text x="160" y="163" fontSize="10" fontWeight="700" fill="#1f4f8f">
+        {legend}
       </text>
     </svg>
   );
 }
 
 export default function InfoPage() {
+  const { t } = useLang();
   return (
     <>
       <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-4 pb-32 pt-5">
@@ -361,21 +396,22 @@ export default function InfoPage() {
 
         <section className="relative mt-4 rounded-3xl bg-surface p-5 shadow-sm">
           <h1 className="text-center text-[22px] font-extrabold leading-snug">
-            Sizning{" "}
-            <span className="text-brand-red">«shox pardangiz»</span> joyidami?
+            {t.info.h1pre} <span className="text-brand-red">{t.info.h1red}</span>{" "}
+            {t.info.h1post}
           </h1>
 
           {/* Belgilar ro'yxati */}
           <div className="mt-5 rounded-2xl bg-white p-5">
             <h2 className="text-center font-extrabold leading-relaxed">
-              Ko'zdagi turli noqulay sezgilarga aslida shox parda
-              shikastlanishi<sup>※</sup> sabab bo'layotgan bo'lishi mumkin
+              {t.info.checklistT1}
+              <sup>※</sup>
+              {t.info.checklistT2 && <> {t.info.checklistT2}</>}
             </h2>
             <p className="mt-1 text-right text-[11px] text-foreground/60">
-              ※ yengil ishqalanish natijasida
+              {t.info.rubNote}
             </p>
             <ul className="mt-4 space-y-3.5">
-              {SYMPTOMS.map((s) => (
+              {t.info.symptoms.map((s) => (
                 <li
                   key={s}
                   className="flex items-start gap-2.5 border-b border-dashed border-foreground/20 pb-3.5 text-[15px] font-bold leading-snug last:border-b-0 last:pb-0"
@@ -390,57 +426,76 @@ export default function InfoPage() {
           {/* Shox parda shikastlanishi nima? */}
           <div className="mt-5 rounded-2xl bg-white p-5">
             <h2 className="text-center text-lg font-extrabold">
-              <span className="text-brand-red">
-                Shox parda shikastlanishi
-              </span>
-              <sup>※</sup> nima?
+              <span className="text-brand-red">{t.info.damageTitleRed}</span>
+              <sup>※</sup> {t.info.damageTitlePost}
             </h2>
             <p className="mt-1 text-right text-[11px] text-foreground/60">
-              ※ yengil ishqalanish natijasida
+              {t.info.rubNote}
             </p>
             <p className="mt-3 text-[15px] leading-relaxed">
               <span className="font-bold text-brand-red">
-                Shox parda shikastlanishi
+                {t.info.damageTextRed}
               </span>{" "}
-              — ko'z yuzasi zararlangan, ammo tashqaridan qaraganda bilinmaydigan
-              holat.
+              {t.info.damageTextPost}
             </p>
-            <NormalEye className="mt-4 w-full rounded-xl" />
-            <DamagedEye className="mt-3 w-full rounded-xl" />
-            <p className="mt-4 text-[15px] leading-relaxed">
-              Yosh o'tishi, kompyuter, smartfon va linzalardan uzoq vaqt
-              foydalanish kabi omillar ta'sirida zamonaviy insonlarda shox parda
-              shikastlanishi tez-tez uchraydi.
-            </p>
-            <CorneaCrack className="mt-4 w-full rounded-xl" />
-            <p className="mt-4 text-[15px] leading-relaxed">
-              Shox parda shikastlanishi ko'z charchog'i, xiralik va qizarish
-              kabi turli belgilarning kuchayishiga olib kelishi mumkin.
-            </p>
-            <SymptomWords className="mt-3 w-full rounded-xl" />
+            <NormalEye className="mt-4 w-full rounded-xl" label={t.info.normalEye} />
+            <DamagedEye
+              className="mt-3 w-full rounded-xl"
+              line1={t.info.damagedEyeL1}
+              line2={t.info.damagedEyeL2}
+              arrowWord={t.info.damagedArrow}
+            />
+            <p className="mt-4 text-[15px] leading-relaxed">{t.info.aging}</p>
+            <CorneaCrack
+              className="mt-4 w-full rounded-xl"
+              cap1={t.info.crackCap1}
+              cap2={t.info.crackCap2}
+            />
+            <p className="mt-4 text-[15px] leading-relaxed">{t.info.worsen}</p>
+            <SymptomWords
+              className="mt-3 w-full rounded-xl"
+              words={[
+                t.info.wordTired,
+                t.info.wordBlur,
+                t.info.wordRed,
+                t.info.wordItch,
+              ]}
+            />
           </div>
 
           {/* A vitamini bo'limi */}
           <div className="mt-5 rounded-2xl bg-white p-5">
             <h2 className="text-center text-lg font-extrabold leading-snug">
-              Shox parda shikastlanishini<sup>※</sup> tiklashda{" "}
-              <span className="text-[#e8930c]">A vitamini</span> samarali
+              {t.info.vt1}
+              <sup>※</sup> {t.info.vt2}{" "}
+              <span className="text-[#e8930c]">{t.info.vtOrange}</span>
+              {t.info.vt3 && <> {t.info.vt3}</>}
             </h2>
             <p className="mt-1 text-right text-[11px] text-foreground/60">
-              ※ yengil ishqalanish natijasida
+              {t.info.rubNote}
             </p>
             <p className="mt-3 text-[15px] leading-relaxed">
-              <span className="font-bold text-[#e8930c]">A vitamini</span>{" "}
-              gialuron kislota ishlab chiqarilishini rag'batlantiradi, ko'z
-              yoshi qatlamini barqarorlashtiradi va shikastlangan shox
-              pardaning tiklanishini tezlashtiradi.
+              <span className="font-bold text-[#e8930c]">
+                {t.info.vitaminOrange}
+              </span>{" "}
+              {t.info.vitaminRest}
             </p>
-            <VitaminDrop className="mt-4 w-full rounded-xl" />
+            <VitaminDrop
+              className="mt-4 w-full rounded-xl"
+              dropLine={t.info.dropLine}
+              note={t.info.imgNote}
+            />
             <div
               className="mx-auto mt-3 h-0 w-0 border-x-[16px] border-t-[14px] border-x-transparent border-t-foreground/50"
               aria-hidden
             />
-            <HyaluronCells className="mt-3 w-full rounded-xl" />
+            <HyaluronCells
+              className="mt-3 w-full rounded-xl"
+              line1={t.info.hyaluronL1}
+              line2={t.info.hyaluronL2}
+              legend={t.info.legend}
+              note={t.info.imgNote}
+            />
           </div>
 
           {/* Pastki tugmalar */}
@@ -449,14 +504,14 @@ export default function InfoPage() {
               href="/result"
               className="flex shrink-0 flex-col items-center justify-center rounded-full bg-white px-5 py-2.5 text-[13px] font-bold leading-tight shadow-sm transition hover:bg-white/70"
             >
-              <span>Tekshiruv natijasiga</span>
-              <span>qaytish</span>
+              <span>{t.info.backL1}</span>
+              <span>{t.info.backL2}</span>
             </Link>
             <Link
               href="/products"
               className="flex-1 rounded-full bg-accent-dark py-4 text-center font-bold text-white transition hover:bg-accent-dark-hover"
             >
-              Keyingisi
+              {t.common.next}
             </Link>
           </div>
         </section>
