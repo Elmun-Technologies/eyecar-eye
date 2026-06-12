@@ -40,10 +40,15 @@ const LEVELS: Array<{ id: Product["recommendFor"][number]; label: string }> = [
   { id: "attention", label: "E'tibor talab" },
 ];
 
+/** Server qabul qiladigan formatlar — bularni o'zgartirmay yuborsa bo'ladi */
+const PASSTHROUGH_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
 /**
  * Telefon suratlari odatda 5–12 MB bo'ladi — yuklashdan oldin brauzerda
- * kichraytiramiz (eng uzun tomoni 1200px, JPEG): server limiti 4 MB ga
- * bemalol sig'adi va sayt tez ochiladi.
+ * kichraytiramiz (eng uzun tomoni 1200px): server limiti 4 MB ga bemalol
+ * sig'adi va sayt tez ochiladi. JPEG → JPEG; PNG/WebP va boshqa formatlar →
+ * WebP (shaffof fon saqlanadi). Brauzer ochadigan istalgan rasm formati
+ * (jumladan WebP) qabul qilinadi.
  */
 async function compressImage(file: File): Promise<Blob> {
   const bitmap = await createImageBitmap(file).catch(() => null);
@@ -54,19 +59,29 @@ async function compressImage(file: File): Promise<Blob> {
   }
   const maxSide = 1200;
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
-  // Kichik va shaffof bo'lmagan fayllarni o'zgartirmay yuboramiz
-  if (scale === 1 && file.size < 500 * 1024) return file;
+  // Kichik va server qabul qiladigan fayllarni o'zgartirmay yuboramiz
+  if (scale === 1 && file.size < 500 * 1024 && PASSTHROUGH_TYPES.has(file.type)) {
+    return file;
+  }
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
   canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  // JPEG'ni JPEG'ligicha qoldiramiz; qolganini WebP qilamiz — shaffoflik
+  // yo'qolmaydi. Brauzer WebP yoza olmasa, o'zi PNG qaytaradi — u ham qabul.
+  const outType = file.type === "image/jpeg" ? "image/jpeg" : "image/webp";
   return new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
       (b) => (b ? resolve(b) : reject(new Error("Suratni siqib bo'lmadi."))),
-      "image/jpeg",
+      outType,
       0.85,
     ),
   );
+}
+
+/** Blob turidan fayl nomi uchun kengaytma */
+function extFor(type: string): string {
+  return type === "image/png" ? "png" : type === "image/webp" ? "webp" : "jpg";
 }
 
 function slugify(name: string): string {
@@ -213,12 +228,11 @@ function ProductEditor({
       setUploading(`${i + 1} / ${files.length} yuklanmoqda…`);
       try {
         const compressed = await compressImage(files[i]);
+        const type = compressed.type || "image/jpeg";
         const form = new FormData();
         form.append(
           "file",
-          new File([compressed], "surat.jpg", {
-            type: compressed.type || "image/jpeg",
-          }),
+          new File([compressed], `surat.${extFor(type)}`, { type }),
         );
         const res = await fetch("/api/admin/upload", {
           method: "POST",
@@ -404,7 +418,7 @@ function ProductEditor({
                 {uploading ?? "+ Surat qo'shish"}
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/*"
                   multiple
                   className="hidden"
                   disabled={uploading !== null}
@@ -417,8 +431,9 @@ function ProductEditor({
               </label>
             </div>
             <p className="mt-1 text-[11px] text-foreground/50">
-              Bir nechta faylni birdaniga tanlash mumkin. Katta suratlar
-              avtomatik kichraytiriladi (≈1200px, JPEG).
+              JPG, PNG, WebP — bir nechtasini birdaniga tanlash mumkin. Katta
+              suratlar avtomatik kichraytiriladi (≈1200px), shaffof fon
+              saqlanadi.
             </p>
             {uploadError && (
               <p className="mt-1 text-xs font-bold text-brand-red">
