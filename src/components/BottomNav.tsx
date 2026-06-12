@@ -26,7 +26,7 @@ export function BottomNav() {
     },
     {
       href: "/products",
-      label: "Davo vositalari",
+      label: "Ko'z tomchilari",
       icon: <DropBottleIcon className="h-7 w-7" />,
     },
   ];

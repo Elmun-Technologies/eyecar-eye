@@ -127,3 +127,15 @@ body {
 .animate-pulse-ring {
   animation: pulse-ring 1.4s ease-out infinite;
 }
+
+@keyframes bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(5px);
+  }
+}
+.animate-bob {
+  animation: bob 0.7s ease-in-out infinite alternate;
+}

@@ -1,16 +1,19 @@
 /**
  * Brend va mahsulot sozlamalari — bitta joydan boshqariladi.
  * Brendingiz / mahsulotlaringiz o'zgarsa faqat shu faylni tahrirlang.
+ *
+ * Ilova — LION «Smile» shox parda tekshiruvi ilovasining o'zbekcha
+ * moslamasi (rasmiy distribyutor uchun).
  */
 
 export const site = {
-  brand: "EyeCare",
-  title: "Ko'z tekshiruvi",
+  brand: "Smile",
+  title: "Shox parda tekshiruvi",
   /** Hero sarlavhadagi qavs ichiga olinadigan so'z */
-  bracketWord: "Ko'z",
+  bracketWord: "Shox parda",
   tagline: "10 soniyada ko'z salomatligi tekshiruvi!",
   description:
-    "AI yordamida ko'z holatini tezkor tekshiring va sinovdan o'tgan davo vositalarimiz bilan tanishing.",
+    "AI yordamida ko'z holatini tezkor tekshiring va LION «Smile» ko'z tomchilari bilan tanishing.",
 } as const;
 
 export type Product = {
@@ -24,32 +27,36 @@ export type Product = {
   url?: string;
 };
 
+/**
+ * LION «Smile» liniyasi. Aniq assortiment, nomlar va matnlarni
+ * distribyutor tasdiqlashi kerak; url hozircha to'ldirilmagan.
+ */
 export const products: Product[] = [
   {
-    id: "eyecare-drops",
-    name: "EyeCare ko'z tomchisi",
-    short: "Qizarish va charchoqni yumshatadi",
+    id: "smile-medical-a",
+    name: "Smile The Medical A",
+    short: "Shox parda tiklanishiga ko'mak",
     description:
-      "Klinik sinovdan o'tgan tarkib: ko'z qizarishini kamaytiradi, namlaydi va uzoq ekran oldida ishlagandagi charchoqni yengillashtiradi.",
+      "Tarkibidagi A vitamini (retinol) shox parda yuzasining tabiiy tiklanishini qo'llab-quvvatlaydi — ekran oldida uzoq ishlaydiganlar uchun.",
     recommendFor: ["moderate", "attention"],
     url: "#",
   },
   {
-    id: "eyecare-moist",
-    name: "EyeCare Moist namlovchi tomchi",
-    short: "Quruqshashga qarshi kundalik namlik",
+    id: "smile-40ex",
+    name: "Smile 40 EX",
+    short: "Charchoq va xiralikka qarshi vitaminli tomchi",
     description:
-      "Ko'z quruqshashini his qilganlar uchun kundalik namlovchi tomchi. Linza taqqanlar ham ishlatishi mumkin.",
-    recommendFor: ["good", "moderate"],
+      "Vitaminlar va aminokislotalar kompleksi ko'z charchog'ini yengillashtiradi va xiralikni kamaytirishga yordam beradi.",
+    recommendFor: ["good", "moderate", "attention"],
     url: "#",
   },
   {
-    id: "eyecare-vita",
-    name: "EyeCare Vita vitamin kompleksi",
-    short: "Ko'z salomatligini ichdan quvvatlaydi",
+    id: "smile-contact",
+    name: "Smile Contact EX",
+    short: "Linza taquvchilar uchun namlovchi tomchi",
     description:
-      "Lyutein, zeaksantin va A vitamini bilan boyitilgan kompleks — ko'rish charchog'ining oldini olishga yordam beradi.",
-    recommendFor: ["good", "moderate", "attention"],
+      "Kontakt linza taqqan holda ham ishlatish mumkin bo'lgan namlovchi tomchi — quruqshash va noqulaylikni yumshatadi.",
+    recommendFor: ["good", "moderate"],
     url: "#",
   },
 ];

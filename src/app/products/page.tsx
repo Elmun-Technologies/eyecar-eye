@@ -3,7 +3,7 @@ import { DropBottleIcon } from "@/components/icons";
 import { products, site } from "@/config/site";
 
 export const metadata = {
-  title: `Davo vositalari — ${site.brand}`,
+  title: `Ko'z tomchilari — ${site.brand}`,
 };
 
 export default function ProductsPage() {
@@ -13,11 +13,11 @@ export default function ProductsPage() {
 
       <header className="relative flex items-center gap-3">
         <DropBottleIcon className="h-9 w-9 text-foreground" />
-        <h1 className="text-xl font-extrabold">Davo vositalari</h1>
+        <h1 className="text-xl font-extrabold">Ko'z tomchilari</h1>
       </header>
       <p className="relative mt-2 text-sm leading-relaxed text-foreground/70">
-        O'z sinovlarimizdan o'tgan, ko'z salomatligi uchun mo'ljallangan
-        vositalarimiz.
+        LION «Smile» liniyasining ko'z salomatligi uchun mo'ljallangan
+        tomchilari — rasmiy distribyutordan.
       </p>
 
       <section className="relative mt-5 space-y-4">

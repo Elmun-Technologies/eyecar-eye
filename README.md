@@ -1,9 +1,10 @@
-# EyeCare — Ko'z tekshiruvi (MVP)
+# Smile — Shox parda tekshiruvi (MVP)
 
-AI yordamida 10 soniyada ko'z holatini tekshiradigan mobil-birinchi veb-ilova.
-Foydalanuvchi old kamera orqali suratga olinadi, ko'z sohasi aniqlanib,
-qizarish va ochiqlik darajasi baholanadi, so'ng qisqa tavsiya va sinovdan
-o'tgan davo vositalari taklif qilinadi.
+AI yordamida 10 soniyada ko'z holatini tekshiradigan mobil-birinchi veb-ilova —
+LION «Smile» shox parda tekshiruvi xizmatining o'zbekcha moslamasi (O'zbekistondagi
+rasmiy distribyutor uchun). Foydalanuvchi old kamera orqali suratga olinadi,
+ko'z sohasi aniqlanib, qizarish va ochiqlik darajasi baholanadi, so'ng qisqa
+tavsiya va «Smile» ko'z tomchilari taklif qilinadi.
 
 > ⚠️ Ushbu xizmat **tibbiy qurilma emas** — natijalar tashxis o'rnini
 > bosmaydi. Ilova ichidagi ogohlantirishlar shu sababli majburiy qism
@@ -11,13 +12,13 @@ o'tgan davo vositalari taklif qilinadi.
 
 ## Oqim
 
-1. **Bosh sahifa** — ikkita asosiy tugma: «Ko'zni AI tekshiruvi» va «Davo vositalari»
+1. **Bosh sahifa** — ikkita asosiy tugma: «Ko'zni AI tekshiruvi» va «Ko'z tomchilari»
 2. **Ogohlantirish modali** — xizmat tibbiy qurilma emasligi, shartlarga rozilik
 3. **Yo'riqnoma (2 bosqich)** — ko'zoynakni yechish, yuzni yashil ramkaga joylashtirish
 4. **Kamera** — old kamera, yashil oval ramka, 3-2-1 hisob bilan surat olish
 5. **Tahlil** — MediaPipe Face Landmarker (to'liq brauzerda, rasm serverga yuborilmaydi)
 6. **Natija** — shox parda va namlik skorlari, 5 yulduzli umumiy baho, ko'z kesmalari
-7. **Ma'lumot sahifasi** — shox parda shikastlanishi haqida + davo vositasi tavsiyasi
+7. **Ma'lumot sahifasi** — shox parda shikastlanishi haqida + ko'z tomchisi tavsiyasi
 
 ## Texnologiyalar
 
@@ -94,7 +95,7 @@ src/
     check/page.tsx    # kamera + suratga olish
     result/page.tsx   # tahlil natijasi (skorlar, yulduzlar)
     info/page.tsx     # shox parda haqida + mahsulot CTA
-    products/page.tsx # davo vositalari
+    products/page.tsx # ko'z tomchilari
     terms/page.tsx    # foydalanish shartlari
   components/         # modal oqimi, nav, ikonkalar, illyustratsiyalar
   config/site.ts      # brend va mahsulotlar

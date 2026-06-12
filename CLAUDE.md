@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-EyeCare — a mobile-first, Uzbek-language web app that "checks" eye health in ~10 seconds: the user takes a front-camera selfie, MediaPipe Face Landmarker locates the eyes **entirely in the browser** (the image never leaves the device — keep it that way; do not add server-side upload of captures), a heuristic scores redness and openness, and the result funnels into product recommendations. It is explicitly **not a medical device** — the UI repeats this disclaimer in several places; preserve those disclaimers when editing.
+Smile — Shox parda tekshiruvi: a mobile-first, Uzbek-language web app that "checks" eye health in ~10 seconds, built as the Uzbek adaptation of LION's Smile cornea-checker service for the official distributor in Uzbekistan (the product funnel sells LION "Smile" eye drops). The user takes a front-camera selfie, MediaPipe Face Landmarker locates the eyes **entirely in the browser** (the image never leaves the device — keep it that way; do not add server-side upload of captures), a heuristic scores redness and openness, and the result funnels into product recommendations. It is explicitly **not a medical device** — the UI repeats this disclaimer in several places; preserve those disclaimers when editing.
+
+The UI is being matched to screenshots of the original Japanese app (eyecare-app.lion-apps.jp) supplied by the owner; visual details (green oval camera frame, score bars, star rating, "scroll ♡" hint, squircle bottom nav) intentionally mirror it. Original photos/text are not copied — illustrations are stylized SVGs and all copy is original Uzbek.
 
 All UI copy, error messages, and code comments are in Uzbek (`<html lang="uz">`).
 
@@ -38,6 +40,6 @@ Everything measurable lives here, including all calibration constants:
 
 ### Configuration and theming
 
-- `src/config/site.ts` is the single source for the brand name, headline, taglines, and the product catalog; `recommendedProducts(level)` decides what `/info` recommends. Change brand/product copy here, not in pages.
+- `src/config/site.ts` is the single source for the brand name, headline, taglines, and the product catalog (LION "Smile" eye-drop lineup — exact assortment/copy pending distributor confirmation); `recommendedProducts(level)` decides what `/info` recommends. Change brand/product copy here, not in pages.
 - Tailwind CSS v4 — there is no `tailwind.config`; design tokens are CSS variables in `src/app/globals.css` mapped through `@theme inline` to utility names (`brand-green`, `brand-red`, `accent-dark`, `surface`, `muted`, …). Shared effects (`dot-pattern`, `glow-card`, `bracketed`, pop-in/pulse animations) are defined there too.
 - Layout is mobile-first: every page constrains content to `max-w-md`.

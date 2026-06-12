@@ -44,7 +44,7 @@ export default function Home() {
           className="flex aspect-square flex-col items-center justify-center gap-3 rounded-[32px] bg-gradient-to-b from-[#d9e4f4] to-[#bed4ee] p-4 shadow-lg transition active:scale-[0.97]"
         >
           <DropBottleIcon className="h-16 w-16 text-foreground" />
-          <span className="text-[15px] font-extrabold">Davo vositalari</span>
+          <span className="text-[15px] font-extrabold">Ko'z tomchilari</span>
         </Link>
       </section>
 

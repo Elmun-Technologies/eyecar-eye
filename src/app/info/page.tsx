@@ -214,7 +214,7 @@ export default function InfoPage() {
                 <DropBottleIcon className="h-9 w-9 text-foreground" />
               </span>
               <h2 className="font-extrabold leading-snug">
-                Sinovdan o'tgan davo vositalarimiz shox parda tiklanishini
+                «Smile» ko'z tomchilari shox parda tiklanishini
                 qo'llab-quvvatlaydi
               </h2>
             </div>
@@ -222,7 +222,7 @@ export default function InfoPage() {
               href="/products"
               className="mt-4 block w-full rounded-full bg-accent-dark py-3.5 text-center font-bold text-white transition hover:bg-accent-dark-hover"
             >
-              Davo vositalarini ko'rish
+              Ko'z tomchilarini ko'rish
             </Link>
           </div>
         </section>

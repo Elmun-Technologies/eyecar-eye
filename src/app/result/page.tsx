@@ -79,6 +79,19 @@ function Stars({ filled }: { filled: number }) {
   );
 }
 
+function HeartIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
+      <path
+        d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6 3.5 7 5.5 5 8 5c1.6 0 3.1.8 4 2.1C12.9 5.8 14.4 5 16 5c2.5 0 4.5 2 4.5 4.6 0 3.7-3.5 6.9-8.5 10.9Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function TearDropIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
@@ -166,8 +179,8 @@ export default function ResultPage() {
               {STAR_VERDICT[stars]}
             </p>
             <p className="mt-3 text-xs leading-relaxed text-foreground/65">
-              ※ Umumiy baho shox parda va namlik skorlari kabi ko'z bilan
-              bog'liq ko'rsatkichlardan jamlab hisoblanadi.
+              ※ Umumiy baho shox parda va namlik skorlarini o'z ichiga olgan,
+              ko'z bilan bog'liq 4 ta ko'rsatkichdan jamlab hisoblanadi.
             </p>
           </div>
 
@@ -198,6 +211,17 @@ export default function ResultPage() {
           >
             Keyingisi
           </Link>
+
+          {/* Pastga aylantirish ishorasi */}
+          <div
+            className="animate-bob mt-3 flex flex-col items-center text-[#f06ba8]"
+            aria-hidden
+          >
+            <span className="text-lg font-extrabold lowercase tracking-widest [text-shadow:0_0_6px_#fff,0_0_12px_#ffd1e6]">
+              scroll
+            </span>
+            <HeartIcon className="-mt-0.5 h-5 w-5" />
+          </div>
         </section>
 
         {/* Ogohlantirish */}
